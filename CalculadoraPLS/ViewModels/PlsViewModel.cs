@@ -13,150 +13,157 @@ namespace CalculadoraPLS.ViewModels
     /// </summary>
     public class PlsViewModel : INotifyPropertyChanged
     {
-        // ─── Cultura pt-BR para parsing com vírgula decimal ──────────────────
+        // ─── Cultura pt-BR para parsing ──────────────────────────────────────
         private static readonly CultureInfo _ptBR = new("pt-BR");
 
-        // ─── Campos privados ─────────────────────────────────────────────────
+        // ─── Campos privados — Vendas ────────────────────────────────────────
         private string _vendaEstimada = string.Empty;
         private string _vendaReal = string.Empty;
         private string _vendaEstimadaFormatada = string.Empty;
         private string _vendaRealFormatada = string.Empty;
+
+        // ─── Campos privados — Inputs por carne ─────────────────────────────
+        // HB
+        private string _hbRecipientes = string.Empty;
+        private string _hbUnidades = string.Empty;
+        // Whopper
+        private string _whopperRecipientes = string.Empty;
+        private string _whopperUnidades = string.Empty;
+        // Rebel
+        private string _rebelRecipientes = string.Empty;
+        private string _rebelUnidades = string.Empty;
+
+        // ─── Campos privados — Resultado ────────────────────────────────────
         private double _diferencaReal;
         private bool _resultadoVisivel;
-        private string _corDiferenca = "#3A3A6A";   // neutro → azul escuro
-        private string _corDiferencaFundo = "#0F0F2A";   // neutro → fundo do card
+        private string _corDiferenca = "#3A3A6A";
+        private string _corDiferencaFundo = "#F5F5FA";
         private string _labelTendencia = "● IGUAL";
         private string _diferencaFormatada = "0,00%";
 
-        // ─── Propriedades de entrada ─────────────────────────────────────────
+        // ════════════════════════════════════════════════════════════════════
+        //  PROPRIEDADES — VENDAS
+        // ════════════════════════════════════════════════════════════════════
 
-        /// <summary>
-        /// Valor bruto da venda estimada enviado pelo code-behind após
-        /// a máscara monetária (formato "369.17" em invariant culture).
-        /// </summary>
         public string VendaEstimada
         {
             get => _vendaEstimada;
-            set
-            {
-                _vendaEstimada = value;
-                OnPropertyChanged();
-                ((Command)CalcularCommand).ChangeCanExecute();
-            }
+            set { _vendaEstimada = value; OnPropertyChanged(); AtualizarPodeCalcular(); }
         }
 
-        /// <summary>
-        /// Valor bruto da venda real enviado pelo code-behind após
-        /// a máscara monetária (formato "369.17" em invariant culture).
-        /// </summary>
         public string VendaReal
         {
             get => _vendaReal;
-            set
-            {
-                _vendaReal = value;
-                OnPropertyChanged();
-                ((Command)CalcularCommand).ChangeCanExecute();
-            }
+            set { _vendaReal = value; OnPropertyChanged(); AtualizarPodeCalcular(); }
         }
 
-        /// <summary>
-        /// Texto já formatado em R$ exibido pelo Entry de Venda Estimada.
-        /// Atualizado pelo code-behind via máscara — binding somente leitura.
-        /// </summary>
         public string VendaEstimadaFormatada
         {
             get => _vendaEstimadaFormatada;
             set { _vendaEstimadaFormatada = value; OnPropertyChanged(); }
         }
 
-        /// <summary>
-        /// Texto já formatado em R$ exibido pelo Entry de Venda Real.
-        /// Atualizado pelo code-behind via máscara — binding somente leitura.
-        /// </summary>
         public string VendaRealFormatada
         {
             get => _vendaRealFormatada;
             set { _vendaRealFormatada = value; OnPropertyChanged(); }
         }
 
-        // ─── Propriedades de resultado ────────────────────────────────────────
+        // ════════════════════════════════════════════════════════════════════
+        //  PROPRIEDADES — INPUTS POR CARNE
+        // ════════════════════════════════════════════════════════════════════
 
-        /// <summary>
-        /// Valor numérico puro da diferença percentual.
-        /// Usado pelo code-behind para o contador animado (Ponto 8).
-        /// </summary>
+        /// <summary>Recipientes HB informados pelo usuário (texto do Entry)</summary>
+        public string HbRecipientes
+        {
+            get => _hbRecipientes;
+            set { _hbRecipientes = value; OnPropertyChanged(); AtualizarPodeCalcular(); }
+        }
+
+        /// <summary>Unidades avulsas HB informadas pelo usuário (texto do Entry)</summary>
+        public string HbUnidades
+        {
+            get => _hbUnidades;
+            set { _hbUnidades = value; OnPropertyChanged(); AtualizarPodeCalcular(); }
+        }
+
+        public string WhopperRecipientes
+        {
+            get => _whopperRecipientes;
+            set { _whopperRecipientes = value; OnPropertyChanged(); AtualizarPodeCalcular(); }
+        }
+
+        public string WhopperUnidades
+        {
+            get => _whopperUnidades;
+            set { _whopperUnidades = value; OnPropertyChanged(); AtualizarPodeCalcular(); }
+        }
+
+        public string RebelRecipientes
+        {
+            get => _rebelRecipientes;
+            set { _rebelRecipientes = value; OnPropertyChanged(); AtualizarPodeCalcular(); }
+        }
+
+        public string RebelUnidades
+        {
+            get => _rebelUnidades;
+            set { _rebelUnidades = value; OnPropertyChanged(); AtualizarPodeCalcular(); }
+        }
+
+        // ════════════════════════════════════════════════════════════════════
+        //  PROPRIEDADES — RESULTADO
+        // ════════════════════════════════════════════════════════════════════
+
         public double DiferencaReal
         {
             get => _diferencaReal;
-            private set
-            {
-                _diferencaReal = value;
-                OnPropertyChanged();
-                AtualizarCorELabel();
-            }
+            private set { _diferencaReal = value; OnPropertyChanged(); AtualizarCorELabel(); }
         }
 
-        /// <summary>
-        /// Texto formatado da diferença. Ex: "+61,09%" ou "-5,30%".
-        /// Atualizado por AtualizarCorELabel().
-        /// </summary>
         public string DiferencaFormatada
         {
             get => _diferencaFormatada;
             private set { _diferencaFormatada = value; OnPropertyChanged(); }
         }
 
-        /// <summary>
-        /// Cor do texto de diferença.
-        /// Acima  → azul  (#0008FF)
-        /// Abaixo → vermelho (#F44336)
-        /// Igual  → cinza-azulado (#3A3A6A)
-        /// </summary>
         public string CorDiferenca
         {
             get => _corDiferenca;
             private set { _corDiferenca = value; OnPropertyChanged(); }
         }
 
-        /// <summary>
-        /// Cor de fundo do pill de tendência (versão escurecida da cor principal).
-        /// </summary>
         public string CorDiferencaFundo
         {
             get => _corDiferencaFundo;
             private set { _corDiferencaFundo = value; OnPropertyChanged(); }
         }
 
-        /// <summary>
-        /// Texto do pill de tendência. Ex: "▲ ACIMA", "▼ ABAIXO", "● IGUAL".
-        /// </summary>
         public string LabelTendencia
         {
             get => _labelTendencia;
             private set { _labelTendencia = value; OnPropertyChanged(); }
         }
 
-        /// <summary>
-        /// Controla a visibilidade do painel de resultados.
-        /// </summary>
         public bool ResultadoVisivel
         {
             get => _resultadoVisivel;
             set { _resultadoVisivel = value; OnPropertyChanged(); }
         }
 
-        /// <summary>
-        /// Lista de resultados por tipo de carne.
-        /// </summary>
+        /// <summary>Lista de resultados por tipo de carne (alimenta o BindableLayout)</summary>
         public ObservableCollection<ResultadoCarne> Resultados { get; } = new();
 
-        // ─── Comandos ─────────────────────────────────────────────────────────
+        // ════════════════════════════════════════════════════════════════════
+        //  COMANDOS
+        // ════════════════════════════════════════════════════════════════════
 
         public ICommand CalcularCommand { get; }
         public ICommand LimparCommand { get; }
 
-        // ─── Construtor ───────────────────────────────────────────────────────
+        // ════════════════════════════════════════════════════════════════════
+        //  CONSTRUTOR
+        // ════════════════════════════════════════════════════════════════════
 
         public PlsViewModel()
         {
@@ -164,49 +171,77 @@ namespace CalculadoraPLS.ViewModels
             LimparCommand = new Command(Limpar);
         }
 
-        // ─── Lógica principal ─────────────────────────────────────────────────
+        // ════════════════════════════════════════════════════════════════════
+        //  LÓGICA PRINCIPAL
+        // ════════════════════════════════════════════════════════════════════
 
         /// <summary>
-        /// Habilita o botão Calcular somente se os dois campos forem válidos
-        /// e a venda estimada for maior que zero.
+        /// Habilita o botão Calcular somente se:
+        /// - Venda Estimada > 0
+        /// - Venda Real preenchida
+        /// - Pelo menos uma carne com recipientes ou unidades > 0
         /// </summary>
         private bool PodeCalcular()
         {
-            return TryParseValor(VendaEstimada, out double est) &&
-                   TryParseValor(VendaReal, out _) &&
-                   est > 0;
+            bool vendasOk = TryParseValor(VendaEstimada, out double est) &&
+                            TryParseValor(VendaReal, out _) &&
+                            est > 0;
+
+            // Verifica se pelo menos uma carne foi preenchida
+            bool algumaCarne =
+                ParseIntSafe(HbRecipientes) > 0 || ParseIntSafe(HbUnidades) > 0 ||
+                ParseIntSafe(WhopperRecipientes) > 0 || ParseIntSafe(WhopperUnidades) > 0 ||
+                ParseIntSafe(RebelRecipientes) > 0 || ParseIntSafe(RebelUnidades) > 0;
+
+            return vendasOk && algumaCarne;
         }
 
-        /// <summary>
-        /// Executa o cálculo principal do PLS.
-        /// </summary>
+        /// <summary>Força reavaliação do CanExecute do botão Calcular.</summary>
+        private void AtualizarPodeCalcular()
+            => ((Command)CalcularCommand).ChangeCanExecute();
+
+        /// <summary>Executa o cálculo principal do PLS.</summary>
         private void Calcular()
         {
             if (!TryParseValor(VendaEstimada, out double estimada) ||
                 !TryParseValor(VendaReal, out double real))
                 return;
 
-            // Calcula e dispara todas as atualizações de cor/label/formatação
+            // Diferença percentual
             DiferencaReal = PlsModel.CalcularDiferencaPercentual(estimada, real);
+
+            // Lê os inputs de cada carne (0 se vazio)
+            int hbRec = ParseIntSafe(HbRecipientes);
+            int hbUn = ParseIntSafe(HbUnidades);
+            int wpRec = ParseIntSafe(WhopperRecipientes);
+            int wpUn = ParseIntSafe(WhopperUnidades);
+            int rebelRec = ParseIntSafe(RebelRecipientes);
+            int rebelUn = ParseIntSafe(RebelUnidades);
 
             // Reconstrói os cards de resultado
             Resultados.Clear();
-            Resultados.Add(PlsModel.CalcularCarne("HB", PlsModel.CapacidadeHB, DiferencaReal));
-            Resultados.Add(PlsModel.CalcularCarne("Whopper", PlsModel.CapacidadeWhopper, DiferencaReal));
-            Resultados.Add(PlsModel.CalcularCarne("Rebel", PlsModel.CapacidadeRebel, DiferencaReal));
+            Resultados.Add(PlsModel.CalcularCarne("HB", PlsModel.CapacidadeHB, hbRec, hbUn, DiferencaReal));
+            Resultados.Add(PlsModel.CalcularCarne("Whopper", PlsModel.CapacidadeWhopper, wpRec, wpUn, DiferencaReal));
+            Resultados.Add(PlsModel.CalcularCarne("Rebel", PlsModel.CapacidadeRebel, rebelRec, rebelUn, DiferencaReal));
 
             ResultadoVisivel = true;
         }
 
-        /// <summary>
-        /// Reseta todos os campos para o estado inicial.
-        /// </summary>
+        /// <summary>Reseta todos os campos para o estado inicial.</summary>
         private void Limpar()
         {
             VendaEstimada = string.Empty;
             VendaReal = string.Empty;
             VendaEstimadaFormatada = string.Empty;
             VendaRealFormatada = string.Empty;
+
+            HbRecipientes = string.Empty;
+            HbUnidades = string.Empty;
+            WhopperRecipientes = string.Empty;
+            WhopperUnidades = string.Empty;
+            RebelRecipientes = string.Empty;
+            RebelUnidades = string.Empty;
+
             DiferencaReal = 0;
             ResultadoVisivel = false;
             Resultados.Clear();
@@ -214,56 +249,46 @@ namespace CalculadoraPLS.ViewModels
 
         /// <summary>
         /// Atualiza cor, fundo e label de tendência conforme o sinal da diferença.
-        ///
-        /// Paleta azul/branco:
-        ///   Acima  → texto #0008FF  | fundo #08082A  | pill "▲ ACIMA"
-        ///   Abaixo → texto #F44336  | fundo #2A0D0D  | pill "▼ ABAIXO"
-        ///   Igual  → texto #3A3A6A  | fundo #0F0F2A  | pill "● IGUAL"
         /// </summary>
         private void AtualizarCorELabel()
         {
-            var sinal = _diferencaReal >= 0 ? "+" : "";
-            DiferencaFormatada = $"{sinal}{_diferencaReal:F2}%";
+            // ✅ Exibe o percentual arredondado para inteiro (regra da apostila)
+            double valorExibir = Math.Round(_diferencaReal, MidpointRounding.AwayFromZero);
+            var sinal = valorExibir >= 0 ? "+" : "";
+            DiferencaFormatada = $"{sinal}{valorExibir:F0}%";
 
             if (_diferencaReal > 0)
             {
-                CorDiferenca = "#0008FF";   // Azul elétrico → acima
-                CorDiferencaFundo = "#EEF0FF";   // Azul bem claro para fundo branco
+                CorDiferenca = "#0008FF";
+                CorDiferencaFundo = "#EEF0FF";
                 LabelTendencia = "▲ ACIMA";
             }
             else if (_diferencaReal < 0)
             {
-                CorDiferenca = "#D32F2F";   // Vermelho escuro → abaixo
-                CorDiferencaFundo = "#FFEEEE";   // Vermelho bem claro para fundo branco
+                CorDiferenca = "#D32F2F";
+                CorDiferencaFundo = "#FFEEEE";
                 LabelTendencia = "▼ ABAIXO";
             }
             else
             {
-                CorDiferenca = "#AAAACC";   // Cinza-azulado → igual
-                CorDiferencaFundo = "#F5F5FA";   // Cinza claríssimo
+                CorDiferenca = "#AAAACC";
+                CorDiferencaFundo = "#F5F5FA";
                 LabelTendencia = "● IGUAL";
             }
         }
-        // ─── Helper de parsing ────────────────────────────────────────────────
 
-        /// <summary>
-        /// Faz parse de string decimal aceitando tanto ponto (invariant)
-        /// quanto vírgula (pt-BR) como separador.
-        /// </summary>
+        // ════════════════════════════════════════════════════════════════════
+        //  HELPERS
+        // ════════════════════════════════════════════════════════════════════
+
+        /// <summary>Parse de decimal aceitando ponto (invariant) ou vírgula (pt-BR).</summary>
         private static bool TryParseValor(string texto, out double valor)
         {
-            if (string.IsNullOrWhiteSpace(texto))
-            {
-                valor = 0;
-                return false;
-            }
+            if (string.IsNullOrWhiteSpace(texto)) { valor = 0; return false; }
 
-            // Tenta invariant (ponto decimal — formato enviado pelo code-behind)
-            if (double.TryParse(texto, NumberStyles.Any,
-                                CultureInfo.InvariantCulture, out valor))
+            if (double.TryParse(texto, NumberStyles.Any, CultureInfo.InvariantCulture, out valor))
                 return true;
 
-            // Fallback: pt-BR (vírgula decimal)
             if (double.TryParse(texto, NumberStyles.Any, _ptBR, out valor))
                 return true;
 
@@ -271,7 +296,15 @@ namespace CalculadoraPLS.ViewModels
             return false;
         }
 
-        // ─── INotifyPropertyChanged ───────────────────────────────────────────
+        /// <summary>
+        /// Parse seguro de inteiro. Retorna 0 se vazio ou inválido.
+        /// </summary>
+        private static int ParseIntSafe(string texto)
+            => int.TryParse(texto?.Trim(), out int v) ? Math.Max(0, v) : 0;
+
+        // ════════════════════════════════════════════════════════════════════
+        //  INotifyPropertyChanged
+        // ════════════════════════════════════════════════════════════════════
 
         public event PropertyChangedEventHandler? PropertyChanged;
 

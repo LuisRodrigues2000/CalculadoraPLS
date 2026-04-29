@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <ContentPage
-    xmlns:models="clr-namespace:CalculadoraPLS.Models"
     x:Class="CalculadoraPLS.Views.PlsPage"
     xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
     xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    xmlns:models="clr-namespace:CalculadoraPLS.Models"
     xmlns:vm="clr-namespace:CalculadoraPLS.ViewModels"
     BackgroundColor="#FFFFFF"
     Shell.NavBarIsVisible="False">
@@ -13,7 +13,6 @@
     </ContentPage.BindingContext>
 
     <ContentPage.Resources>
-
         <!-- Remove borda azul padrão do Entry no Android -->
         <Style TargetType="Entry">
             <Setter Property="VisualStateManager.VisualStateGroups">
@@ -30,7 +29,6 @@
                 </VisualStateGroupList>
             </Setter>
         </Style>
-
     </ContentPage.Resources>
 
     <Grid>
@@ -45,8 +43,6 @@
                 <!--  CABEÇALHO                                 -->
                 <!-- ══════════════════════════════════════════ -->
                 <VerticalStackLayout Spacing="0" Margin="0,0,0,44">
-
-                    <!-- Assinatura -->
                     <Label
                         Text="Desenvolvido por Luis Rodrigues"
                         FontSize="11"
@@ -55,8 +51,6 @@
                         HorizontalOptions="Center"
                         CharacterSpacing="1"
                         Margin="0,0,0,18" />
-
-                    <!-- Logo PLS — preto bold, estilo ZAMP -->
                     <Label
                         Text="PLS"
                         FontSize="72"
@@ -64,8 +58,6 @@
                         TextColor="#0A0066"
                         HorizontalOptions="Center"
                         CharacterSpacing="5" />
-
-                    <!-- Subtítulo azul elétrico -->
                     <Label
                         Text="CALCULADORA DE PRODUÇÃO"
                         FontSize="11"
@@ -74,8 +66,6 @@
                         HorizontalOptions="Center"
                         CharacterSpacing="5"
                         Margin="0,6,0,0" />
-
-                    <!-- Linha decorativa -->
                     <Grid Margin="0,22,0,0" HeightRequest="2">
                         <BoxView BackgroundColor="#EEEEEE" />
                         <BoxView
@@ -84,7 +74,6 @@
                             HeightRequest="2"
                             HorizontalOptions="Center" />
                     </Grid>
-
                 </VerticalStackLayout>
 
                 <!-- ══════════════════════════════════════════ -->
@@ -99,7 +88,6 @@
                         TextColor="#0A0066"
                         CharacterSpacing="5"
                         Margin="2,0,0,4" />
-
 
                     <!-- Card: Venda Estimada -->
                     <Border
@@ -123,7 +111,6 @@
                                     FontAttributes="Bold"
                                     TextColor="#0A0066"
                                     CharacterSpacing="3" />
-
                                 <Entry
                                     x:Name="EntryEstimada"
                                     Text="{Binding VendaEstimadaFormatada}"
@@ -140,7 +127,6 @@
                                     TextChanged="EntryEstimada_TextChanged"
                                     Completed="EntryEstimada_Completed" />
                             </VerticalStackLayout>
-                            <!-- Linha de foco — começa cinza, vira azul -->
                             <BoxView
                                 x:Name="FocusLineEstimada"
                                 Grid.Row="1"
@@ -172,12 +158,11 @@
                                     FontAttributes="Bold"
                                     TextColor="#0A0066"
                                     CharacterSpacing="3" />
-
                                 <Entry
                                     x:Name="EntryReal"
                                     Text="{Binding VendaRealFormatada}"
                                     Keyboard="Numeric"
-                                    ReturnType="Done"
+                                    ReturnType="Next"
                                     FontSize="36"
                                     FontAttributes="Bold"
                                     TextColor="#0A0066"
@@ -199,6 +184,300 @@
                     </Border>
 
                 </VerticalStackLayout>
+
+                <!-- ══════════════════════════════════════════ -->
+                <!--  PAINEL DE CARNES — INPUTS                 -->
+                <!-- ══════════════════════════════════════════ -->
+                <VerticalStackLayout Spacing="12" Margin="0,0,0,28">
+
+                    <Label
+                        Text="CARNES"
+                        FontSize="14"
+                        FontAttributes="Bold"
+                        TextColor="#0A0066"
+                        CharacterSpacing="5"
+                        Margin="2,0,0,4" />
+
+                    <!-- ─── Card HB ─────────────────────────────────── -->
+                    <Border
+                        BackgroundColor="#FFFFFF"
+                        StrokeShape="RoundRectangle 16"
+                        Stroke="#E8E8F0"
+                        StrokeThickness="1.5"
+                        Padding="20,18">
+                        <Border.Shadow>
+                            <Shadow Brush="#0008FF" Offset="0,2" Radius="12" Opacity="0.06" />
+                        </Border.Shadow>
+                        <VerticalStackLayout Spacing="14">
+
+                            <!-- Título -->
+                            <Label
+                                Text="HB"
+                                FontSize="18"
+                                FontAttributes="Bold"
+                                TextColor="#0A0066"
+                                CharacterSpacing="2" />
+
+                            <BoxView HeightRequest="1" BackgroundColor="#F0F0F8" />
+
+                            <!-- Recipientes + Unidades -->
+                            <Grid ColumnDefinitions="*,24,*">
+
+                                <!-- Recipientes -->
+                                <VerticalStackLayout Grid.Column="0" Spacing="6">
+                                    <Label
+                                        Text="RECIPIENTES"
+                                        FontSize="10"
+                                        FontAttributes="Bold"
+                                        TextColor="#AAAACC"
+                                        CharacterSpacing="2" />
+                                    <Grid RowDefinitions="*,2">
+                                        <Entry
+                                            x:Name="EntryHbRecipientes"
+                                            Text="{Binding HbRecipientes}"
+                                            Keyboard="Numeric"
+                                            ReturnType="Next"
+                                            FontSize="28"
+                                            FontAttributes="Bold"
+                                            TextColor="#0008FF"
+                                            BackgroundColor="Transparent"
+                                            Placeholder="0"
+                                            PlaceholderColor="#CCCCDD"
+                                            Focused="OnEntryInputFocused"
+                                            Unfocused="OnEntryInputUnfocused"
+                                            Completed="OnEntryHbRecipientesCompleted" />
+                                        <BoxView
+                                            Grid.Row="1"
+                                            HeightRequest="2"
+                                            BackgroundColor="#E8E8F0" />
+                                    </Grid>
+                                </VerticalStackLayout>
+
+                                <!-- Divisor vertical -->
+                                <BoxView
+                                    Grid.Column="1"
+                                    WidthRequest="1"
+                                    BackgroundColor="#F0F0F8"
+                                    VerticalOptions="Fill" />
+
+                                <!-- Unidades -->
+                                <VerticalStackLayout Grid.Column="2" Spacing="6" Margin="8,0,0,0">
+                                    <Label
+                                        Text="UNIDADES"
+                                        FontSize="10"
+                                        FontAttributes="Bold"
+                                        TextColor="#AAAACC"
+                                        CharacterSpacing="2" />
+                                    <Grid RowDefinitions="*,2">
+                                        <Entry
+                                            x:Name="EntryHbUnidades"
+                                            Text="{Binding HbUnidades}"
+                                            Keyboard="Numeric"
+                                            ReturnType="Next"
+                                            FontSize="28"
+                                            FontAttributes="Bold"
+                                            TextColor="#0A0066"
+                                            BackgroundColor="Transparent"
+                                            Placeholder="0"
+                                            PlaceholderColor="#CCCCDD"
+                                            Focused="OnEntryInputFocused"
+                                            Unfocused="OnEntryInputUnfocused"
+                                            Completed="OnEntryHbUnidadesCompleted" />
+                                        <BoxView
+                                            Grid.Row="1"
+                                            HeightRequest="2"
+                                            BackgroundColor="#E8E8F0" />
+                                    </Grid>
+                                </VerticalStackLayout>
+
+                            </Grid>
+                        </VerticalStackLayout>
+                    </Border>
+
+                    <!-- ─── Card Whopper ──────────────────────────────── -->
+                    <Border
+                        BackgroundColor="#FFFFFF"
+                        StrokeShape="RoundRectangle 16"
+                        Stroke="#E8E8F0"
+                        StrokeThickness="1.5"
+                        Padding="20,18">
+                        <Border.Shadow>
+                            <Shadow Brush="#0008FF" Offset="0,2" Radius="12" Opacity="0.06" />
+                        </Border.Shadow>
+                        <VerticalStackLayout Spacing="14">
+
+                            <Label
+                                Text="Whopper"
+                                FontSize="18"
+                                FontAttributes="Bold"
+                                TextColor="#0A0066"
+                                CharacterSpacing="1" />
+
+                            <BoxView HeightRequest="1" BackgroundColor="#F0F0F8" />
+
+                            <Grid ColumnDefinitions="*,24,*">
+
+                                <VerticalStackLayout Grid.Column="0" Spacing="6">
+                                    <Label
+                                        Text="RECIPIENTES"
+                                        FontSize="10"
+                                        FontAttributes="Bold"
+                                        TextColor="#AAAACC"
+                                        CharacterSpacing="2" />
+                                    <Grid RowDefinitions="*,2">
+                                        <Entry
+                                            x:Name="EntryWhopperRecipientes"
+                                            Text="{Binding WhopperRecipientes}"
+                                            Keyboard="Numeric"
+                                            ReturnType="Next"
+                                            FontSize="28"
+                                            FontAttributes="Bold"
+                                            TextColor="#0008FF"
+                                            BackgroundColor="Transparent"
+                                            Placeholder="0"
+                                            PlaceholderColor="#CCCCDD"
+                                            Focused="OnEntryInputFocused"
+                                            Unfocused="OnEntryInputUnfocused"
+                                            Completed="OnEntryWhopperRecipientesCompleted" />
+                                        <BoxView
+                                            Grid.Row="1"
+                                            HeightRequest="2"
+                                            BackgroundColor="#E8E8F0" />
+                                    </Grid>
+                                </VerticalStackLayout>
+
+                                <BoxView
+                                    Grid.Column="1"
+                                    WidthRequest="1"
+                                    BackgroundColor="#F0F0F8"
+                                    VerticalOptions="Fill" />
+
+                                <VerticalStackLayout Grid.Column="2" Spacing="6" Margin="8,0,0,0">
+                                    <Label
+                                        Text="UNIDADES"
+                                        FontSize="10"
+                                        FontAttributes="Bold"
+                                        TextColor="#AAAACC"
+                                        CharacterSpacing="2" />
+                                    <Grid RowDefinitions="*,2">
+                                        <Entry
+                                            x:Name="EntryWhopperUnidades"
+                                            Text="{Binding WhopperUnidades}"
+                                            Keyboard="Numeric"
+                                            ReturnType="Next"
+                                            FontSize="28"
+                                            FontAttributes="Bold"
+                                            TextColor="#0A0066"
+                                            BackgroundColor="Transparent"
+                                            Placeholder="0"
+                                            PlaceholderColor="#CCCCDD"
+                                            Focused="OnEntryInputFocused"
+                                            Unfocused="OnEntryInputUnfocused"
+                                            Completed="OnEntryWhopperUnidadesCompleted" />
+                                        <BoxView
+                                            Grid.Row="1"
+                                            HeightRequest="2"
+                                            BackgroundColor="#E8E8F0" />
+                                    </Grid>
+                                </VerticalStackLayout>
+
+                            </Grid>
+                        </VerticalStackLayout>
+                    </Border>
+
+                    <!-- ─── Card Rebel ────────────────────────────────── -->
+                    <Border
+                        BackgroundColor="#FFFFFF"
+                        StrokeShape="RoundRectangle 16"
+                        Stroke="#E8E8F0"
+                        StrokeThickness="1.5"
+                        Padding="20,18">
+                        <Border.Shadow>
+                            <Shadow Brush="#0008FF" Offset="0,2" Radius="12" Opacity="0.06" />
+                        </Border.Shadow>
+                        <VerticalStackLayout Spacing="14">
+
+                            <Label
+                                Text="Rebel"
+                                FontSize="18"
+                                FontAttributes="Bold"
+                                TextColor="#0A0066"
+                                CharacterSpacing="1" />
+
+                            <BoxView HeightRequest="1" BackgroundColor="#F0F0F8" />
+
+                            <Grid ColumnDefinitions="*,24,*">
+
+                                <VerticalStackLayout Grid.Column="0" Spacing="6">
+                                    <Label
+                                        Text="RECIPIENTES"
+                                        FontSize="10"
+                                        FontAttributes="Bold"
+                                        TextColor="#AAAACC"
+                                        CharacterSpacing="2" />
+                                    <Grid RowDefinitions="*,2">
+                                        <Entry
+                                            x:Name="EntryRebelRecipientes"
+                                            Text="{Binding RebelRecipientes}"
+                                            Keyboard="Numeric"
+                                            ReturnType="Next"
+                                            FontSize="28"
+                                            FontAttributes="Bold"
+                                            TextColor="#0008FF"
+                                            BackgroundColor="Transparent"
+                                            Placeholder="0"
+                                            PlaceholderColor="#CCCCDD"
+                                            Focused="OnEntryInputFocused"
+                                            Unfocused="OnEntryInputUnfocused"
+                                            Completed="OnEntryRebelRecipientesCompleted" />
+                                        <BoxView
+                                            Grid.Row="1"
+                                            HeightRequest="2"
+                                            BackgroundColor="#E8E8F0" />
+                                    </Grid>
+                                </VerticalStackLayout>
+
+                                <BoxView
+                                    Grid.Column="1"
+                                    WidthRequest="1"
+                                    BackgroundColor="#F0F0F8"
+                                    VerticalOptions="Fill" />
+
+                                <VerticalStackLayout Grid.Column="2" Spacing="6" Margin="8,0,0,0">
+                                    <Label
+                                        Text="UNIDADES"
+                                        FontSize="10"
+                                        FontAttributes="Bold"
+                                        TextColor="#AAAACC"
+                                        CharacterSpacing="2" />
+                                    <Grid RowDefinitions="*,2">
+                                        <Entry
+                                            x:Name="EntryRebelUnidades"
+                                            Text="{Binding RebelUnidades}"
+                                            Keyboard="Numeric"
+                                            ReturnType="Done"
+                                            FontSize="28"
+                                            FontAttributes="Bold"
+                                            TextColor="#0A0066"
+                                            BackgroundColor="Transparent"
+                                            Placeholder="0"
+                                            PlaceholderColor="#CCCCDD"
+                                            Focused="OnEntryInputFocused"
+                                            Unfocused="OnEntryInputUnfocused"
+                                            Completed="OnEntryRebelUnidadesCompleted" />
+                                        <BoxView
+                                            Grid.Row="1"
+                                            HeightRequest="2"
+                                            BackgroundColor="#E8E8F0" />
+                                    </Grid>
+                                </VerticalStackLayout>
+
+                            </Grid>
+                        </VerticalStackLayout>
+                    </Border>
+
+                </VerticalStackLayout>
+                <!-- fim CARNES -->
 
                 <!-- ══════════════════════════════════════════ -->
                 <!--  BOTÃO CALCULAR                            -->
@@ -236,12 +515,7 @@
                     TranslationY="40"
                     Spacing="14">
 
-                    <BoxView
-                        x:Name="ScrollAnchor"
-                        HeightRequest="1"
-                        BackgroundColor="Transparent" />
-
-                    <!-- Divisor de seção -->
+                    <BoxView x:Name="ScrollAnchor" HeightRequest="1" BackgroundColor="Transparent" />
                     <BoxView HeightRequest="1" BackgroundColor="#EEEEEE" Margin="0,0,0,4" />
 
                     <!-- Card da diferença percentual -->
@@ -259,7 +533,6 @@
                             <Shadow Brush="#0008FF" Offset="0,4" Radius="16" Opacity="0.08" />
                         </Border.Shadow>
                         <Grid ColumnDefinitions="*,Auto">
-
                             <VerticalStackLayout Grid.Column="0" Spacing="4">
                                 <Label
                                     Text="DIFERENÇA"
@@ -267,17 +540,14 @@
                                     FontAttributes="Bold"
                                     TextColor="#0A0066"
                                     CharacterSpacing="5" />
-
                                 <Label
                                     x:Name="LblDiferenca"
                                     Text="0,00%"
-                                    FontSize="56"
+                                    FontSize="45"
                                     FontAttributes="Bold"
                                     TextColor="{Binding CorDiferenca}"
                                     LineBreakMode="NoWrap" />
                             </VerticalStackLayout>
-
-                            <!-- Pill de tendência -->
                             <Border
                                 BackgroundColor="{Binding CorDiferencaFundo}"
                                 StrokeShape="RoundRectangle 10"
@@ -291,7 +561,6 @@
                                     FontAttributes="Bold"
                                     TextColor="{Binding CorDiferenca}" />
                             </Border>
-
                         </Grid>
                     </Border>
 
@@ -304,15 +573,13 @@
                         CharacterSpacing="5"
                         Margin="2,50,0,-30" />
 
-
-                    <!-- Cards de carne via BindableLayout -->
+                    <!-- Cards de resultado por carne -->
                     <VerticalStackLayout
                         x:Name="ListaCarnes"
                         BindableLayout.ItemsSource="{Binding Resultados}"
                         Spacing="12">
                         <BindableLayout.ItemTemplate>
                             <DataTemplate x:DataType="models:ResultadoCarne">
-
                                 <Border
                                     BackgroundColor="#FFFFFF"
                                     StrokeShape="RoundRectangle 16"
@@ -330,7 +597,7 @@
                                             <TapGestureRecognizer Tapped="OnCardCarneTapped" />
                                         </VerticalStackLayout.GestureRecognizers>
 
-                                        <!-- Cabeçalho: Nome + Chevron -->
+                                        <!-- Nome da carne + chevron -->
                                         <Grid ColumnDefinitions="*,Auto">
                                             <Label
                                                 Text="{Binding Nome}"
@@ -350,10 +617,9 @@
                                                 Margin="0,0,2,0" />
                                         </Grid>
 
-                                        <!-- Divisor -->
                                         <BoxView HeightRequest="1" BackgroundColor="#F0F0F8" />
 
-                                        <!-- Recipientes + Restantes -->
+                                        <!-- Recipientes + Unidades avulsas -->
                                         <Grid ColumnDefinitions="*,1,*">
 
                                             <VerticalStackLayout Grid.Column="0" Spacing="4">
@@ -363,14 +629,11 @@
                                                     FontAttributes="Bold"
                                                     TextColor="#AAAACC"
                                                     CharacterSpacing="2" />
-                                                <Label
-                                                    FontSize="52"
-                                                    FontAttributes="Bold"
-                                                    LineBreakMode="NoWrap">
+                                                <Label FontSize="52" FontAttributes="Bold" LineBreakMode="NoWrap">
                                                     <Label.FormattedText>
                                                         <FormattedString>
                                                             <Span
-                                                                Text="{Binding Recipientes}"
+                                                                Text="{Binding RecipientesFinal}"
                                                                 FontSize="52"
                                                                 FontAttributes="Bold"
                                                                 TextColor="#0008FF" />
@@ -384,7 +647,6 @@
                                                 </Label>
                                             </VerticalStackLayout>
 
-                                            <!-- Divisor vertical -->
                                             <BoxView
                                                 Grid.Column="1"
                                                 WidthRequest="1"
@@ -399,14 +661,11 @@
                                                     FontAttributes="Bold"
                                                     TextColor="#AAAACC"
                                                     CharacterSpacing="2" />
-                                                <Label
-                                                    FontSize="52"
-                                                    FontAttributes="Bold"
-                                                    LineBreakMode="NoWrap">
+                                                <Label FontSize="52" FontAttributes="Bold" LineBreakMode="NoWrap">
                                                     <Label.FormattedText>
                                                         <FormattedString>
                                                             <Span
-                                                                Text="{Binding UnidadesRestantes}"
+                                                                Text="{Binding UnidadesRestantesFinal}"
                                                                 FontSize="52"
                                                                 FontAttributes="Bold"
                                                                 TextColor="#0A0066" />
@@ -422,13 +681,11 @@
 
                                         </Grid>
 
-                                        <!-- ── Painel expansível ── -->
+                                        <!-- ── Painel expansível (detalhes) ── -->
                                         <VerticalStackLayout IsVisible="False" Spacing="12">
-
                                             <BoxView HeightRequest="1" BackgroundColor="#F0F0F8" />
 
                                             <Grid ColumnDefinitions="*,*" RowDefinitions="Auto,Auto">
-
                                                 <Label
                                                     Text="CALCULADO"
                                                     FontSize="10"
@@ -463,12 +720,11 @@
                                                     Grid.Row="1" Grid.Column="1">
                                                     <Label.FormattedText>
                                                         <FormattedString>
-                                                            <Span Text="{Binding UnidadesArredondadas}" />
+                                                            <Span Text="{Binding UnidadesFinais}" />
                                                             <Span Text=" un" TextColor="#AAAACC" FontSize="13" />
                                                         </FormattedString>
                                                     </Label.FormattedText>
                                                 </Label>
-
                                             </Grid>
 
                                             <!-- Aviso de arredondamento -->
@@ -485,7 +741,7 @@
                                                             <Span Text="⚠  " FontAttributes="Bold" />
                                                             <Span Text="{Binding UnidadesExatas, StringFormat='{0:F2}'}" FontAttributes="Bold" />
                                                             <Span Text="  →  " TextColor="#AAAACC" />
-                                                            <Span Text="{Binding UnidadesArredondadas}" FontAttributes="Bold" />
+                                                            <Span Text="{Binding UnidadesFinais}" FontAttributes="Bold" />
                                                             <Span Text=" unidades" TextColor="#0008FF" />
                                                         </FormattedString>
                                                     </Label.FormattedText>
@@ -497,12 +753,10 @@
 
                                     </VerticalStackLayout>
                                 </Border>
-
                             </DataTemplate>
                         </BindableLayout.ItemTemplate>
                     </VerticalStackLayout>
 
-                    <!-- Espaço extra para o FAB não sobrepor o último card -->
                     <BoxView HeightRequest="100" BackgroundColor="Transparent" />
 
                 </VerticalStackLayout>
@@ -524,16 +778,12 @@
             Margin="0,0,24,36"
             WidthRequest="68"
             HeightRequest="68">
-
-            <!-- Halo azul sutil -->
             <Ellipse
                 WidthRequest="68"
                 HeightRequest="68"
                 Fill="#200008FF"
                 HorizontalOptions="Center"
                 VerticalOptions="Center" />
-
-            <!-- Botão redondo -->
             <Border
                 x:Name="BtnLimpar"
                 WidthRequest="60"
@@ -560,10 +810,7 @@
                     VerticalOptions="Center"
                     Margin="0,0,0,2" />
             </Border>
-
         </Grid>
 
     </Grid>
-    <!-- fim Grid raiz -->
-
 </ContentPage>

@@ -1,44 +1,52 @@
 ﻿namespace CalculadoraPLS.Models
 {
-    /// <summary>
-    /// Representa o resultado calculado para um tipo de carne.
-    /// </summary>
     public class ResultadoCarne
     {
-        /// <summary>Nome do tipo de carne. Ex: "HB", "Whopper", "Rebel"</summary>
+        // ─── Identificação ───────────────────────────────────────────────────
         public string Nome { get; set; } = string.Empty;
-
-        /// <summary>Capacidade fixa do recipiente. Ex: 12, 9 ou 8</summary>
         public int Capacidade { get; set; }
 
-        /// <summary>Valor calculado antes do arredondamento. Ex: 19,33</summary>
+        // ─── Input do usuário ────────────────────────────────────────────────
+        public int RecipientesInformados { get; set; }
+        public int UnidadesAvulsasInformadas { get; set; }
+
+        // ─── Resultado do cálculo ────────────────────────────────────────────
+
+        /// <summary>
+        /// Total de unidades base: (RecipientesInformados × Capacidade) + UnidadesAvulsasInformadas
+        /// </summary>
+        public int UnidadesTotaisBase { get; set; }
+
+        /// <summary>Valor calculado ANTES do arredondamento. Ex: 12,72</summary>
         public double UnidadesExatas { get; set; }
 
-        /// <summary>Valor após arredondamento para baixo. Ex: 19</summary>
-        public int UnidadesArredondadas { get; set; }
+        /// <summary>Valor APÓS Ceiling. Ex: 13</summary>
+        public int UnidadesFinais { get; set; }
 
         /// <summary>
-        /// Quantos recipientes COMPLETOS cabem nas unidades calculadas.
-        /// Ex: 19 / 12 = 1 recipiente completo
+        /// Recipientes COMPLETOS que cabem nas unidades finais.
+        /// Ex: 13 / 12 = 1 recipiente completo.
+        /// Se UnidadesFinais menor que Capacidade → 0 recipientes.
         /// </summary>
-        public int Recipientes => UnidadesArredondadas / Capacidade;
+        public int RecipientesFinal => UnidadesFinais / Capacidade;
 
         /// <summary>
-        /// Sobra de unidades que NÃO completam um recipiente.
-        /// Ex: 19 % 12 = 7 unidades restantes
+        /// Unidades que sobram após os recipientes completos.
+        /// Ex: 13 % 12 = 1 unidade restante.
+        /// Se resultado cabe em menos de 1 recipiente → todas as unidades aparecem aqui.
         /// </summary>
-        public int UnidadesRestantes => UnidadesArredondadas % Capacidade;
+        public int UnidadesRestantesFinal => UnidadesFinais % Capacidade;
 
-        /// <summary>Indica se o valor foi arredondado.</summary>
+        /// <summary>Indica se o valor exato foi arredondado para cima.</summary>
         public bool FoiArredondado { get; set; }
 
         /// <summary>
-        /// Texto descritivo do arredondamento para exibir na tela.
-        /// Ex: "Valor original: 19,33 arredondado para 19"
+        /// Mensagem descritiva do arredondamento.
+        /// Ex: "12,72 → 13 unidades"
         /// </summary>
         public string MensagemArredondamento =>
             FoiArredondado
-                ? $"Valor original: {UnidadesExatas:F2} → arredondado para {UnidadesArredondadas}"
+                ? $"{UnidadesExatas:F2} → {UnidadesFinais} unidades"
                 : string.Empty;
     }
 }

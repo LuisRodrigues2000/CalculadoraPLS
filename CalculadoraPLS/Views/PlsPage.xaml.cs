@@ -14,144 +14,126 @@ public partial class PlsPage : ContentPage
     }
 
     // ─────────────────────────────────────────────────────────────────────────
-    //  PONTO 1 — MÁSCARA MONETÁRIA
+    //  PONTO 1 — MÁSCARA MONETÁRIA (Venda Estimada e Venda Real)
     // ─────────────────────────────────────────────────────────────────────────
 
     private void EntryEstimada_TextChanged(object? sender, TextChangedEventArgs e)
     {
         if (_atualizandoEstimada) return;
         _atualizandoEstimada = true;
-
         try
         {
             var texto = e.NewTextValue ?? "";
-            System.Diagnostics.Debug.WriteLine($"[ESTIMADA] TextChanged: '{texto}'");
-
             if (BindingContext is PlsViewModel vm)
                 vm.VendaEstimada = texto;
         }
-        catch (Exception ex)
-        {
-            System.Diagnostics.Debug.WriteLine($"[ESTIMADA] ERRO: {ex}");
-        }
-        finally
-        {
-            _atualizandoEstimada = false;
-        }
+        finally { _atualizandoEstimada = false; }
     }
 
     private void EntryReal_TextChanged(object? sender, TextChangedEventArgs e)
     {
         if (_atualizandoReal) return;
         _atualizandoReal = true;
-
         try
         {
             var texto = e.NewTextValue ?? "";
-            System.Diagnostics.Debug.WriteLine($"[REAL] TextChanged: '{texto}'");
-
             if (BindingContext is PlsViewModel vm)
                 vm.VendaReal = texto;
         }
-        catch (Exception ex)
-        {
-            System.Diagnostics.Debug.WriteLine($"[REAL] ERRO: {ex}");
-        }
-        finally
-        {
-            _atualizandoReal = false;
-        }
+        finally { _atualizandoReal = false; }
     }
 
     // ─────────────────────────────────────────────────────────────────────────
     //  HELPERS DE FORMATAÇÃO MONETÁRIA
     // ─────────────────────────────────────────────────────────────────────────
 
-    /// <summary>Converte dígitos crus em R$ 0,00.</summary>
     private static string FormatarMoeda(string digitosCrus)
     {
         try
         {
             if (string.IsNullOrEmpty(digitosCrus)) return "";
-
             var apenasNumeros = ExtrairDigitos(digitosCrus);
             if (string.IsNullOrEmpty(apenasNumeros)) return "";
-
             if (!long.TryParse(apenasNumeros, out long valorCentavos)) return "";
 
             long reais = valorCentavos / 100;
             long centavos = valorCentavos % 100;
 
-            string centavosStr = centavos.ToString("D2");
-            string reaisStr = FormatarMilhar(reais.ToString());
-
-            return $"R$ {reaisStr},{centavosStr}";
+            return $"R$ {FormatarMilhar(reais.ToString())},{centavos:D2}";
         }
-        catch (Exception ex)
-        {
-            System.Diagnostics.Debug.WriteLine($"[FORMAT_MOEDA] Erro: {ex.Message}");
-            return "";
-        }
+        catch { return ""; }
     }
 
-    /// <summary>Insere pontos de milhar. Ex: "1234567" → "1.234.567"</summary>
     private static string FormatarMilhar(string inteiro)
     {
         if (string.IsNullOrEmpty(inteiro)) return "0";
-
         var resultado = "";
         var contador = 0;
-        var tamanho = inteiro.Length;
-
-        for (int i = tamanho - 1; i >= 0; i--)
+        for (int i = inteiro.Length - 1; i >= 0; i--)
         {
             if (contador > 0 && contador % 3 == 0)
                 resultado = "." + resultado;
-
             resultado = inteiro[i] + resultado;
             contador++;
         }
-
         return resultado;
     }
 
-    /// <summary>Extrai somente dígitos de uma string.</summary>
     private static string ExtrairDigitos(string texto)
     {
         if (string.IsNullOrEmpty(texto)) return "";
-
         var sb = new System.Text.StringBuilder();
         foreach (char c in texto)
-        {
-            if (char.IsDigit(c))
-                sb.Append(c);
-        }
+            if (char.IsDigit(c)) sb.Append(c);
         return sb.ToString();
     }
 
-    /// <summary>Converte dígitos crus para decimal. Ex: "36917" → 369.17</summary>
-    private static decimal DigitosParaDecimal(string digitosCrus)
-    {
-        if (string.IsNullOrEmpty(digitosCrus)) return 0m;
-        if (!long.TryParse(digitosCrus, out long centavos)) return 0m;
-        return centavos / 100m;
-    }
-
     // ─────────────────────────────────────────────────────────────────────────
-    //  PONTO 2 — LINHA DE FOCO VERDE
+    //  PONTO 2 — LINHA DE FOCO (Venda Estimada e Venda Real)
     // ─────────────────────────────────────────────────────────────────────────
 
     private void EntryEstimada_Focused(object? sender, FocusEventArgs e)
-        => FocusLineEstimada.BackgroundColor = Color.FromArgb("#0008FF"); // era #4CAF50
+        => FocusLineEstimada.BackgroundColor = Color.FromArgb("#0008FF");
 
     private void EntryEstimada_Unfocused(object? sender, FocusEventArgs e)
-        => FocusLineEstimada.BackgroundColor = Color.FromArgb("#E8E8F0"); // era #252525
+        => FocusLineEstimada.BackgroundColor = Color.FromArgb("#E8E8F0");
 
     private void EntryReal_Focused(object? sender, FocusEventArgs e)
-        => FocusLineReal.BackgroundColor = Color.FromArgb("#0008FF");     // era #4CAF50
+        => FocusLineReal.BackgroundColor = Color.FromArgb("#0008FF");
 
     private void EntryReal_Unfocused(object? sender, FocusEventArgs e)
-        => FocusLineReal.BackgroundColor = Color.FromArgb("#E8E8F0");     // era #252525
+        => FocusLineReal.BackgroundColor = Color.FromArgb("#E8E8F0");
+
+    // ─────────────────────────────────────────────────────────────────────────
+    //  LINHA DE FOCO — CAMPOS DE CARNE (evento genérico reutilizável)
+    //  O BoxView de foco fica na Row=1 do Grid pai do Entry.
+    // ─────────────────────────────────────────────────────────────────────────
+
+    private void OnEntryInputFocused(object? sender, FocusEventArgs e)
+        => DefinirLinhaFocoCarne(sender, "#0008FF");
+
+    private void OnEntryInputUnfocused(object? sender, FocusEventArgs e)
+        => DefinirLinhaFocoCarne(sender, "#E8E8F0");
+
+    /// <summary>
+    /// Localiza o BoxView de foco que está na Row=1 do Grid pai do Entry
+    /// e aplica a cor informada.
+    /// </summary>
+    private static void DefinirLinhaFocoCarne(object? sender, string hexCor)
+    {
+        if (sender is not Entry entry) return;
+
+        // O Entry está dentro de um Grid (RowDefinitions="*,2")
+        if (entry.Parent is Grid grid)
+        {
+            var linha = grid.Children
+                .OfType<BoxView>()
+                .FirstOrDefault(b => Grid.GetRow(b) == 1);
+
+            if (linha is not null)
+                linha.BackgroundColor = Color.FromArgb(hexCor);
+        }
+    }
 
     // ─────────────────────────────────────────────────────────────────────────
     //  PONTO 3 — ÁREA DE TOQUE DOS CARDS DE VENDA
@@ -164,20 +146,47 @@ public partial class PlsPage : ContentPage
         => EntryReal.Focus();
 
     // ─────────────────────────────────────────────────────────────────────────
-    //  NAVEGAÇÃO ENTRE CAMPOS
+    //  NAVEGAÇÃO ENTRE CAMPOS — VENDAS
     // ─────────────────────────────────────────────────────────────────────────
 
     private void EntryEstimada_Completed(object? sender, EventArgs e)
         => EntryReal.Focus();
 
     private void EntryReal_Completed(object? sender, EventArgs e)
+        => EntryHbRecipientes.Focus();   // avança para o primeiro campo de carne
+
+    // ─────────────────────────────────────────────────────────────────────────
+    //  NAVEGAÇÃO ENTRE CAMPOS — CARNES (Tab order completo)
+    // ─────────────────────────────────────────────────────────────────────────
+
+    private void OnEntryHbRecipientesCompleted(object? sender, EventArgs e)
+        => EntryHbUnidades.Focus();
+
+    private void OnEntryHbUnidadesCompleted(object? sender, EventArgs e)
+        => EntryWhopperRecipientes.Focus();
+
+    private void OnEntryWhopperRecipientesCompleted(object? sender, EventArgs e)
+        => EntryWhopperUnidades.Focus();
+
+    private void OnEntryWhopperUnidadesCompleted(object? sender, EventArgs e)
+        => EntryRebelRecipientes.Focus();
+
+    private void OnEntryRebelRecipientesCompleted(object? sender, EventArgs e)
+        => EntryRebelUnidades.Focus();
+
+    /// <summary>
+    /// Último campo — fecha o teclado e dispara o cálculo automaticamente
+    /// se todos os dados estiverem preenchidos.
+    /// </summary>
+    private void OnEntryRebelUnidadesCompleted(object? sender, EventArgs e)
     {
-        EntryReal.Unfocus();
+        EntryRebelUnidades.Unfocus();
 
         if (BindingContext is PlsViewModel vm && vm.CalcularCommand.CanExecute(null))
+        {
             vm.CalcularCommand.Execute(null);
-
-        _ = AnimarResultadosAsync();
+            _ = AnimarResultadosAsync();
+        }
     }
 
     // ─────────────────────────────────────────────────────────────────────────
@@ -202,7 +211,7 @@ public partial class PlsPage : ContentPage
     }
 
     // ─────────────────────────────────────────────────────────────────────────
-    //  PONTO 7 — ANIMAÇÃO DE ENTRADA DOS RESULTADOS + FAB
+    //  ANIMAÇÃO DE ENTRADA DOS RESULTADOS
     // ─────────────────────────────────────────────────────────────────────────
 
     private async Task AnimarResultadosAsync()
@@ -210,7 +219,6 @@ public partial class PlsPage : ContentPage
         if (BindingContext is not PlsViewModel vm) return;
         if (!vm.ResultadoVisivel) return;
 
-        // ── Estado inicial dos resultados ─────────────────────────────────
         PainelResultados.Opacity = 0;
         PainelResultados.TranslationY = 40;
         PainelResultados.IsVisible = true;
@@ -234,23 +242,20 @@ public partial class PlsPage : ContentPage
         await Task.Delay(100);
         await MainScroll.ScrollToAsync(ScrollAnchor, ScrollToPosition.Start, animated: true);
 
-        // ── FAB aparece após os resultados entrarem ───────────────────────
         await AnimarFabEntradaAsync();
     }
 
     // ─────────────────────────────────────────────────────────────────────────
-    //  FAB — ANIMAÇÃO DE ENTRADA (spring suave vindo de baixo)
+    //  FAB — ANIMAÇÃO DE ENTRADA
     // ─────────────────────────────────────────────────────────────────────────
 
     private async Task AnimarFabEntradaAsync()
     {
-        // Garante estado inicial limpo antes de exibir
         BtnLimparContainer.Opacity = 0;
         BtnLimparContainer.TranslationY = 40;
         BtnLimparContainer.Scale = 0.7;
         BtnLimparContainer.IsVisible = true;
 
-        // Sobe e aparece com efeito spring
         await Task.WhenAll(
             BtnLimparContainer.FadeToAsync(1, 350, Easing.CubicOut),
             BtnLimparContainer.TranslateToAsync(0, 0, 400, Easing.SpringOut),
@@ -259,7 +264,7 @@ public partial class PlsPage : ContentPage
     }
 
     // ─────────────────────────────────────────────────────────────────────────
-    //  FAB — ANIMAÇÃO DE SAÍDA (desce e desaparece)
+    //  FAB — ANIMAÇÃO DE SAÍDA
     // ─────────────────────────────────────────────────────────────────────────
 
     private async Task AnimarFabSaidaAsync()
@@ -271,18 +276,19 @@ public partial class PlsPage : ContentPage
         );
 
         BtnLimparContainer.IsVisible = false;
-
-        // Reseta para próxima entrada
         BtnLimparContainer.TranslationY = 40;
         BtnLimparContainer.Scale = 0.7;
     }
 
     // ─────────────────────────────────────────────────────────────────────────
-    //  PONTO 8 — CONTADOR ANIMADO
+    //  CONTADOR ANIMADO DA DIFERENÇA %
     // ─────────────────────────────────────────────────────────────────────────
 
     private async Task AnimarContadorAsync(double valorFinal)
     {
+        // ✅ Arredonda o percentual para inteiro antes de exibir (regra da apostila)
+        double valorExibir = Math.Round(valorFinal, MidpointRounding.AwayFromZero);
+
         const int duracaoMs = 800;
         const int frames = 40;
         const int delayMs = duracaoMs / frames;
@@ -291,15 +297,15 @@ public partial class PlsPage : ContentPage
         {
             var progresso = (double)i / frames;
             var progressoEased = 1 - Math.Pow(1 - progresso, 3);
-            var valorAtual = valorFinal * progressoEased;
+            var valorAtual = valorExibir * progressoEased;
             var sinal = valorAtual >= 0 ? "+" : "";
 
-            LblDiferenca.Text = $"{sinal}{valorAtual:F2}%";
+            LblDiferenca.Text = $"{sinal}{valorAtual:F0}%";
             await Task.Delay(delayMs);
         }
 
-        var sinalFinal = valorFinal >= 0 ? "+" : "";
-        LblDiferenca.Text = $"{sinalFinal}{valorFinal:F2}%";
+        var sinalFinal = valorExibir >= 0 ? "+" : "";
+        LblDiferenca.Text = $"{sinalFinal}{valorExibir:F0}%";
     }
 
     // ─────────────────────────────────────────────────────────────────────────
@@ -314,13 +320,7 @@ public partial class PlsPage : ContentPage
             .OfType<VisualElement>()
             .ToList();
 
-        if (cards.Count == 0)
-        {
-            System.Diagnostics.Debug.WriteLine("[ANIM] Nenhum card encontrado em ListaCarnes");
-            return;
-        }
-
-        System.Diagnostics.Debug.WriteLine($"[ANIM] {cards.Count} cards encontrados");
+        if (cards.Count == 0) return;
 
         foreach (var card in cards)
         {
@@ -352,14 +352,12 @@ public partial class PlsPage : ContentPage
             System.Diagnostics.Debug.WriteLine($"[HAPTIC] {ex.Message}");
         }
 
-        // Gira o ícone e esconde o FAB ao mesmo tempo
         await Task.WhenAll(
             BtnLimpar.RotateToAsync(360, 320, Easing.CubicOut),
             AnimarFabSaidaAsync()
         );
         BtnLimpar.Rotation = 0;
 
-        // Esconde os resultados
         if (PainelResultados.IsVisible)
         {
             await PainelResultados.FadeToAsync(0, 200, Easing.CubicOut);
@@ -367,11 +365,11 @@ public partial class PlsPage : ContentPage
             PainelResultados.TranslationY = 40;
         }
 
-        // Limpa o ViewModel
+        // Limpa o ViewModel (zera todos os campos incluindo os de carne)
         if (BindingContext is PlsViewModel vm && vm.LimparCommand.CanExecute(null))
             vm.LimparCommand.Execute(null);
 
-        // Limpa os campos de texto
+        // Limpa os Entries de venda manualmente (evita reentrância da máscara)
         _atualizandoEstimada = true;
         _atualizandoReal = true;
         EntryEstimada.Text = "";
@@ -379,12 +377,21 @@ public partial class PlsPage : ContentPage
         _atualizandoEstimada = false;
         _atualizandoReal = false;
 
+        // Limpa os Entries de carne (binding bidirecional já cuida,
+        // mas limpamos o Text para garantir que o teclado não mantenha cache)
+        EntryHbRecipientes.Text = "";
+        EntryHbUnidades.Text = "";
+        EntryWhopperRecipientes.Text = "";
+        EntryWhopperUnidades.Text = "";
+        EntryRebelRecipientes.Text = "";
+        EntryRebelUnidades.Text = "";
+
         await MainScroll.ScrollToAsync(0, 0, animated: true);
         EntryEstimada.Focus();
     }
 
     // ─────────────────────────────────────────────────────────────────────────
-    //  PAINEL EXPANSÍVEL — CHEVRON
+    //  PAINEL EXPANSÍVEL DOS CARDS DE CARNE
     // ─────────────────────────────────────────────────────────────────────────
 
     private async void OnCardCarneTapped(object? sender, TappedEventArgs e)
@@ -396,12 +403,12 @@ public partial class PlsPage : ContentPage
 
         foreach (var filho in stackInterno.Children)
         {
-            // Chevron: Label FontSize=36 dentro do Grid de cabeçalho
+            // Localiza o chevron dentro do Grid de cabeçalho
             if (filho is Grid grid && chevron is null)
             {
                 foreach (var itemGrid in grid.Children)
                 {
-                    if (itemGrid is Label lbl && lbl.FontSize == 36)
+                    if (itemGrid is Label lbl && lbl.FontSize == 32)
                     {
                         chevron = lbl;
                         break;
@@ -409,7 +416,7 @@ public partial class PlsPage : ContentPage
                 }
             }
 
-            // Painel expansível: último VerticalStackLayout filho do stack raiz
+            // Painel expansível: último VerticalStackLayout do stack
             if (filho is VerticalStackLayout vsl)
                 painelDetalhes = vsl;
         }
@@ -427,7 +434,7 @@ public partial class PlsPage : ContentPage
             if (chevron is not null)
             {
                 chevron.Text = "∨";
-                chevron.TextColor = Color.FromArgb("#4CAF50");
+                chevron.TextColor = Color.FromArgb("#0008FF");
             }
         }
         else
@@ -438,7 +445,7 @@ public partial class PlsPage : ContentPage
             if (chevron is not null)
             {
                 chevron.Text = "›";
-                chevron.TextColor = Color.FromArgb("#444444");
+                chevron.TextColor = Color.FromArgb("#CCCCDD");
             }
         }
     }

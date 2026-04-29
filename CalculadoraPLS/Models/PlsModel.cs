@@ -23,37 +23,50 @@
 
         /// <summary>
         /// Calcula o resultado para um tipo de carne.
-        /// Fórmula: Unidades = Capacidade × (1 + Diferença% / 100)
-        /// Arredondamento: para baixo (Floor).
-        /// Recipientes e UnidadesRestantes são calculados automaticamente
-        /// via propriedades em ResultadoCarne.
+        ///
+        /// Fluxo:
+        ///   1. Unidades Totais = (recipientes × capacidade) + unidadesAvulsas
+        ///   2. Novas Unidades  = Unidades Totais × (1 + diferença% / 100)  → Ceiling
+        ///   3. Novos Recipientes = Novas Unidades / capacidade              → Ceiling
+        ///   4. Unidades Restantes = Novas Unidades - (Novos Recipientes × capacidade)
+        ///
+        ///   Obs: se Unidades Totais = 0, o resultado também é zerado.
         /// </summary>
         public static ResultadoCarne CalcularCarne(
             string nome,
             int capacidade,
+            int recipientesInformados,
+            int unidadesAvulsas,
             double diferencaPercentual)
         {
-            // Aplica a diferença percentual sobre a capacidade do recipiente
-            double unidadesExatas = capacidade * (1 + (diferencaPercentual / 100));
+            // Arredonda o percentual para inteiro antes de aplicar (regra da apostila)
+            double diferencaArredondada = Math.Round(
+                diferencaPercentual, MidpointRounding.AwayFromZero);
 
-            // Garante que nunca seja negativo
+            // 1. Total de unidades base
+            int unidadesTotaisBase = (recipientesInformados * capacidade) + unidadesAvulsas;
+
+            // 2. Aplica o percentual arredondado
+            double unidadesExatas = unidadesTotaisBase * (1.0 + (diferencaArredondada / 100.0));
             unidadesExatas = Math.Max(0, unidadesExatas);
 
-            // Arredonda para baixo (Floor)
-            int unidadesArredondadas = (int)Math.Floor(unidadesExatas);
+            // 3. ✅ Arredondamento matemático convencional (não mais Ceiling)
+            //    < 0,5 → arredonda pra baixo | >= 0,5 → arredonda pra cima
+            int unidadesFinais = (int)Math.Round(
+                unidadesExatas, MidpointRounding.AwayFromZero);
 
-            // Verifica se houve arredondamento
-            bool foiArredondado = unidadesExatas != unidadesArredondadas;
+            bool foiArredondado = unidadesExatas != Math.Floor(unidadesExatas);
 
             return new ResultadoCarne
             {
                 Nome = nome,
                 Capacidade = capacidade,
+                RecipientesInformados = recipientesInformados,
+                UnidadesAvulsasInformadas = unidadesAvulsas,
+                UnidadesTotaisBase = unidadesTotaisBase,
                 UnidadesExatas = unidadesExatas,
-                UnidadesArredondadas = unidadesArredondadas,
+                UnidadesFinais = unidadesFinais,
                 FoiArredondado = foiArredondado
-                // ✅ Recipientes e UnidadesRestantes são propriedades
-                //    calculadas automaticamente em ResultadoCarne
             };
         }
     }
