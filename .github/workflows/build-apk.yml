@@ -13,27 +13,26 @@ jobs:
       - name: Checkout do código
         uses: actions/checkout@v4
 
-      - name: Instalar .NET 9
+      - name: Instalar .NET 10 (preview)
         uses: actions/setup-dotnet@v4
         with:
-          dotnet-version: '9.0.x'
+          dotnet-version: '10.0.x'
+          dotnet-quality: 'preview'
 
       - name: Instalar workload maui-android
-        run: |
-          dotnet workload install maui-android
+        run: dotnet workload install maui-android --ignore-failed-sources
 
       - name: Restaurar dependências
-        run: dotnet restore
+        run: dotnet restore CalculadoraPLS/CalculadoraPLS.csproj -f net10.0-android
 
       - name: Gerar APK
-        run: |
-          dotnet build -f net9.0-android -c Release
+        run: dotnet build CalculadoraPLS/CalculadoraPLS.csproj -f net10.0-android -c Release
 
       - name: Upload do APK
         uses: actions/upload-artifact@v4
         with:
           name: CalculadoraPLS
           path: |
-            **/*-Signed.apk
+            **/*Signed*.apk
             **/*.apk
           retention-days: 30
