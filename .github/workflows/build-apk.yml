@@ -1,0 +1,45 @@
+name: Build APK
+
+on:
+  push:
+    branches: [ main ]
+  workflow_dispatch:  # permite rodar manualmente pelo site
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout do código
+        uses: actions/checkout@v4
+
+      - name: Instalar .NET 9
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '9.0.x'
+
+      - name: Instalar workload Android
+        run: dotnet workload install android
+
+      - name: Restaurar dependências
+        run: dotnet restore
+
+      - name: Gerar APK
+        run: >
+          dotnet publish
+          -f net9.0-android
+          -c Release
+          -p:AndroidSigningKeyAlias=upload
+          -p:AndroidSigningKeyPass=${{ secrets.KEYSTORE_PASSWORD }}
+          -p:AndroidSigningStorePass=${{ secrets.KEYSTORE_PASSWORD }}
+          -p:AndroidKeyStore=true
+          -p:AndroidSigningKeyStore=minha-chave.keystore
+
+      - name: Upload do APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: CalculadoraPLS
+          path: |
+            **/*-Signed.apk
+            **/*.apk
+          retention-days: 30  # fica disponível por 30 dias
