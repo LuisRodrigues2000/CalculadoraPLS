@@ -2,8 +2,8 @@ name: Build APK
 
 on:
   push:
-    branches: [ main ]
-  workflow_dispatch:  # permite rodar manualmente pelo site
+    branches: [ main, master ]
+  workflow_dispatch:
 
 jobs:
   build:
@@ -18,22 +18,16 @@ jobs:
         with:
           dotnet-version: '9.0.x'
 
-      - name: Instalar workload Android
-        run: dotnet workload install android
+      - name: Instalar workload maui-android
+        run: |
+          dotnet workload install maui-android
 
       - name: Restaurar dependências
         run: dotnet restore
 
       - name: Gerar APK
-        run: >
-          dotnet publish
-          -f net9.0-android
-          -c Release
-          -p:AndroidSigningKeyAlias=upload
-          -p:AndroidSigningKeyPass=${{ secrets.KEYSTORE_PASSWORD }}
-          -p:AndroidSigningStorePass=${{ secrets.KEYSTORE_PASSWORD }}
-          -p:AndroidKeyStore=true
-          -p:AndroidSigningKeyStore=minha-chave.keystore
+        run: |
+          dotnet build -f net9.0-android -c Release
 
       - name: Upload do APK
         uses: actions/upload-artifact@v4
@@ -42,4 +36,4 @@ jobs:
           path: |
             **/*-Signed.apk
             **/*.apk
-          retention-days: 30  # fica disponível por 30 dias
+          retention-days: 30
