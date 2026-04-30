@@ -1,10 +1,10 @@
+using System.ComponentModel;
 using CalculadoraPLS.ViewModels;
 
 namespace CalculadoraPLS.Views;
 
 public partial class PlsPage : ContentPage
 {
-    // ── Controle de reentrância da máscara ───────────────────────────────────
     private bool _atualizandoEstimada = false;
     private bool _atualizandoReal = false;
 
@@ -14,7 +14,7 @@ public partial class PlsPage : ContentPage
     }
 
     // ─────────────────────────────────────────────────────────────────────────
-    //  PONTO 1 — MÁSCARA MONETÁRIA (Venda Estimada e Venda Real)
+    //  FORMATAÇÃO DE MOEDA
     // ─────────────────────────────────────────────────────────────────────────
 
     private void EntryEstimada_TextChanged(object? sender, TextChangedEventArgs e)
@@ -23,9 +23,8 @@ public partial class PlsPage : ContentPage
         _atualizandoEstimada = true;
         try
         {
-            var texto = e.NewTextValue ?? "";
             if (BindingContext is PlsViewModel vm)
-                vm.VendaEstimada = texto;
+                vm.VendaEstimada = e.NewTextValue ?? "";
         }
         finally { _atualizandoEstimada = false; }
     }
@@ -36,47 +35,10 @@ public partial class PlsPage : ContentPage
         _atualizandoReal = true;
         try
         {
-            var texto = e.NewTextValue ?? "";
             if (BindingContext is PlsViewModel vm)
-                vm.VendaReal = texto;
+                vm.VendaReal = e.NewTextValue ?? "";
         }
         finally { _atualizandoReal = false; }
-    }
-
-    // ─────────────────────────────────────────────────────────────────────────
-    //  HELPERS DE FORMATAÇÃO MONETÁRIA
-    // ─────────────────────────────────────────────────────────────────────────
-
-    private static string FormatarMoeda(string digitosCrus)
-    {
-        try
-        {
-            if (string.IsNullOrEmpty(digitosCrus)) return "";
-            var apenasNumeros = ExtrairDigitos(digitosCrus);
-            if (string.IsNullOrEmpty(apenasNumeros)) return "";
-            if (!long.TryParse(apenasNumeros, out long valorCentavos)) return "";
-
-            long reais = valorCentavos / 100;
-            long centavos = valorCentavos % 100;
-
-            return $"R$ {FormatarMilhar(reais.ToString())},{centavos:D2}";
-        }
-        catch { return ""; }
-    }
-
-    private static string FormatarMilhar(string inteiro)
-    {
-        if (string.IsNullOrEmpty(inteiro)) return "0";
-        var resultado = "";
-        var contador = 0;
-        for (int i = inteiro.Length - 1; i >= 0; i--)
-        {
-            if (contador > 0 && contador % 3 == 0)
-                resultado = "." + resultado;
-            resultado = inteiro[i] + resultado;
-            contador++;
-        }
-        return resultado;
     }
 
     private static string ExtrairDigitos(string texto)
@@ -89,7 +51,7 @@ public partial class PlsPage : ContentPage
     }
 
     // ─────────────────────────────────────────────────────────────────────────
-    //  PONTO 2 — LINHA DE FOCO (Venda Estimada e Venda Real)
+    //  FOCO — LINHAS ANIMADAS
     // ─────────────────────────────────────────────────────────────────────────
 
     private void EntryEstimada_Focused(object? sender, FocusEventArgs e)
@@ -104,40 +66,24 @@ public partial class PlsPage : ContentPage
     private void EntryReal_Unfocused(object? sender, FocusEventArgs e)
         => FocusLineReal.BackgroundColor = Color.FromArgb("#E8E8F0");
 
-    // ─────────────────────────────────────────────────────────────────────────
-    //  LINHA DE FOCO — CAMPOS DE CARNE (evento genérico reutilizável)
-    //  O BoxView de foco fica na Row=1 do Grid pai do Entry.
-    // ─────────────────────────────────────────────────────────────────────────
-
     private void OnEntryInputFocused(object? sender, FocusEventArgs e)
         => DefinirLinhaFocoCarne(sender, "#0008FF");
 
     private void OnEntryInputUnfocused(object? sender, FocusEventArgs e)
         => DefinirLinhaFocoCarne(sender, "#E8E8F0");
 
-    /// <summary>
-    /// Localiza o BoxView de foco que está na Row=1 do Grid pai do Entry
-    /// e aplica a cor informada.
-    /// </summary>
     private static void DefinirLinhaFocoCarne(object? sender, string hexCor)
     {
         if (sender is not Entry entry) return;
-
-        // O Entry está dentro de um Grid (RowDefinitions="*,2")
         if (entry.Parent is Grid grid)
         {
             var linha = grid.Children
                 .OfType<BoxView>()
                 .FirstOrDefault(b => Grid.GetRow(b) == 1);
-
             if (linha is not null)
                 linha.BackgroundColor = Color.FromArgb(hexCor);
         }
     }
-
-    // ─────────────────────────────────────────────────────────────────────────
-    //  PONTO 3 — ÁREA DE TOQUE DOS CARDS DE VENDA
-    // ─────────────────────────────────────────────────────────────────────────
 
     private void OnCardEstimadaTapped(object? sender, TappedEventArgs e)
         => EntryEstimada.Focus();
@@ -146,46 +92,63 @@ public partial class PlsPage : ContentPage
         => EntryReal.Focus();
 
     // ─────────────────────────────────────────────────────────────────────────
-    //  NAVEGAÇÃO ENTRE CAMPOS — VENDAS
+    //  NAVEGAÇÃO — VENDAS
     // ─────────────────────────────────────────────────────────────────────────
 
     private void EntryEstimada_Completed(object? sender, EventArgs e)
         => EntryReal.Focus();
 
     private void EntryReal_Completed(object? sender, EventArgs e)
-        => EntryHbRecipientes.Focus();   // avança para o primeiro campo de carne
-
-    // ─────────────────────────────────────────────────────────────────────────
-    //  NAVEGAÇÃO ENTRE CAMPOS — CARNES (Tab order completo)
-    // ─────────────────────────────────────────────────────────────────────────
-
-    private void OnEntryHbRecipientesCompleted(object? sender, EventArgs e)
         => EntryHbUnidades.Focus();
 
-    private void OnEntryHbUnidadesCompleted(object? sender, EventArgs e)
-        => EntryWhopperRecipientes.Focus();
+    // ─────────────────────────────────────────────────────────────────────────
+    //  NAVEGAÇÃO — CARNES (Unidades → Recipientes por carne)
+    // ─────────────────────────────────────────────────────────────────────────
 
-    private void OnEntryWhopperRecipientesCompleted(object? sender, EventArgs e)
+    private void OnEntryHbUnidadesCompleted(object? sender, EventArgs e)
+        => EntryHbRecipientes.Focus();
+
+    private void OnEntryHbRecipientesCompleted(object? sender, EventArgs e)
         => EntryWhopperUnidades.Focus();
 
     private void OnEntryWhopperUnidadesCompleted(object? sender, EventArgs e)
+        => EntryWhopperRecipientes.Focus();
+
+    private void OnEntryWhopperRecipientesCompleted(object? sender, EventArgs e)
+        => EntryRebelUnidades.Focus();
+
+    private void OnEntryRebelUnidadesCompleted(object? sender, EventArgs e)
         => EntryRebelRecipientes.Focus();
 
     private void OnEntryRebelRecipientesCompleted(object? sender, EventArgs e)
-        => EntryRebelUnidades.Focus();
+        => EntryBkChickenUnidades.Focus();
+
+    // ─────────────────────────────────────────────────────────────────────────
+    //  NAVEGAÇÃO — ESPECIAIS (Unidades → Recipientes por carne)
+    // ─────────────────────────────────────────────────────────────────────────
+
+    private void OnEntryBkChickenUnidadesCompleted(object? sender, EventArgs e)
+        => EntryBkChickenRecipientes.Focus();
+
+    private void OnEntryBkChickenRecipientesCompleted(object? sender, EventArgs e)
+        => EntryChickenJrUnidades.Focus();
+
+    private void OnEntryChickenJrUnidadesCompleted(object? sender, EventArgs e)
+        => EntryChickenJrRecipientes.Focus();
 
     /// <summary>
-    /// Último campo — fecha o teclado e dispara o cálculo automaticamente
-    /// se todos os dados estiverem preenchidos.
+    /// Último campo do formulário — fecha teclado e dispara o cálculo.
     /// </summary>
-    private void OnEntryRebelUnidadesCompleted(object? sender, EventArgs e)
+    private async void OnEntryChickenJrRecipientesCompleted(object? sender, EventArgs e)
     {
-        EntryRebelUnidades.Unfocus();
+        EntryChickenJrRecipientes.Unfocus();
 
         if (BindingContext is PlsViewModel vm && vm.CalcularCommand.CanExecute(null))
         {
+            // ✅ Aguarda o comando assíncrono terminar ANTES de animar
             vm.CalcularCommand.Execute(null);
-            _ = AnimarResultadosAsync();
+            await EsperarCalculoTerminarAsync(vm);
+            await AnimarResultadosAsync();
         }
     }
 
@@ -195,19 +158,47 @@ public partial class PlsPage : ContentPage
 
     private async void OnCalcularTapped(object? sender, TappedEventArgs e)
     {
-        try { HapticFeedback.Default.Perform(HapticFeedbackType.Click); }
-        catch (Exception ex)
-        {
-            System.Diagnostics.Debug.WriteLine($"[HAPTIC] {ex.Message}");
-        }
+        if (BindingContext is not PlsViewModel vm) return;
+        if (!vm.CalcularCommand.CanExecute(null)) return;
 
+        // Feedback tátil
+        try { HapticFeedback.Default.Perform(HapticFeedbackType.Click); }
+        catch (Exception ex) { System.Diagnostics.Debug.WriteLine($"[HAPTIC] {ex.Message}"); }
+
+        // Animação de pressão do botão
         await BtnCalcular.ScaleToAsync(0.95, 70, Easing.CubicOut);
         await BtnCalcular.ScaleToAsync(1.00, 70, Easing.CubicIn);
 
-        if (BindingContext is PlsViewModel vm && vm.CalcularCommand.CanExecute(null))
-            vm.CalcularCommand.Execute(null);
+        // ✅ Executa o comando (que internamente é async)
+        vm.CalcularCommand.Execute(null);
 
-        await AnimarResultadosAsync();
+        // ✅ Aguarda o IsLoading voltar a false — só então anima os resultados
+        await EsperarCalculoTerminarAsync(vm);
+
+        // ✅ Verifica novamente se o resultado está disponível
+        if (vm.ResultadoVisivel)
+            await AnimarResultadosAsync();
+    }
+
+    /// <summary>
+    /// Aguarda o ViewModel terminar o cálculo assíncrono,
+    /// monitorando IsLoading com polling leve.
+    /// Tem timeout de segurança de 5 segundos.
+    /// </summary>
+    private static async Task EsperarCalculoTerminarAsync(PlsViewModel vm)
+    {
+        // Dá um tick para o IsLoading = true ser propagado
+        await Task.Delay(50);
+
+        const int timeoutMs = 5000;
+        const int intervaloMs = 50;
+        int esperado = 0;
+
+        while (vm.IsLoading && esperado < timeoutMs)
+        {
+            await Task.Delay(intervaloMs);
+            esperado += intervaloMs;
+        }
     }
 
     // ─────────────────────────────────────────────────────────────────────────
@@ -236,7 +227,8 @@ public partial class PlsPage : ContentPage
 
         await Task.WhenAll(
             AnimarContadorAsync(vm.DiferencaReal),
-            AnimarCardsCarneAsync()
+            AnimarCardsCarneAsync(),
+            AnimarCardsEspeciaisAsync()
         );
 
         await Task.Delay(100);
@@ -244,10 +236,6 @@ public partial class PlsPage : ContentPage
 
         await AnimarFabEntradaAsync();
     }
-
-    // ─────────────────────────────────────────────────────────────────────────
-    //  FAB — ANIMAÇÃO DE ENTRADA
-    // ─────────────────────────────────────────────────────────────────────────
 
     private async Task AnimarFabEntradaAsync()
     {
@@ -263,10 +251,6 @@ public partial class PlsPage : ContentPage
         );
     }
 
-    // ─────────────────────────────────────────────────────────────────────────
-    //  FAB — ANIMAÇÃO DE SAÍDA
-    // ─────────────────────────────────────────────────────────────────────────
-
     private async Task AnimarFabSaidaAsync()
     {
         await Task.WhenAll(
@@ -280,13 +264,8 @@ public partial class PlsPage : ContentPage
         BtnLimparContainer.Scale = 0.7;
     }
 
-    // ─────────────────────────────────────────────────────────────────────────
-    //  CONTADOR ANIMADO DA DIFERENÇA %
-    // ─────────────────────────────────────────────────────────────────────────
-
     private async Task AnimarContadorAsync(double valorFinal)
     {
-        // ✅ Arredonda o percentual para inteiro antes de exibir (regra da apostila)
         double valorExibir = Math.Round(valorFinal, MidpointRounding.AwayFromZero);
 
         const int duracaoMs = 800;
@@ -299,7 +278,6 @@ public partial class PlsPage : ContentPage
             var progressoEased = 1 - Math.Pow(1 - progresso, 3);
             var valorAtual = valorExibir * progressoEased;
             var sinal = valorAtual >= 0 ? "+" : "";
-
             LblDiferenca.Text = $"{sinal}{valorAtual:F0}%";
             await Task.Delay(delayMs);
         }
@@ -308,15 +286,39 @@ public partial class PlsPage : ContentPage
         LblDiferenca.Text = $"{sinalFinal}{valorExibir:F0}%";
     }
 
-    // ─────────────────────────────────────────────────────────────────────────
-    //  CASCATA DOS CARDS DE CARNE
-    // ─────────────────────────────────────────────────────────────────────────
-
     private async Task AnimarCardsCarneAsync()
     {
         await Task.Delay(50);
 
         var cards = ListaCarnes.Children
+            .OfType<VisualElement>()
+            .ToList();
+
+        if (cards.Count == 0) return;
+
+        foreach (var card in cards)
+        {
+            card.Opacity = 0;
+            card.TranslationY = 30;
+        }
+
+        foreach (var card in cards)
+        {
+            _ = Task.WhenAll(
+                card.FadeToAsync(1, 400, Easing.CubicOut),
+                card.TranslateToAsync(0, 0, 400, Easing.CubicOut)
+            );
+            await Task.Delay(80);
+        }
+
+        await Task.Delay(400);
+    }
+
+    private async Task AnimarCardsEspeciaisAsync()
+    {
+        await Task.Delay(200);
+
+        var cards = ListaEspeciais.Children
             .OfType<VisualElement>()
             .ToList();
 
@@ -347,10 +349,7 @@ public partial class PlsPage : ContentPage
     private async void OnLimparTapped(object? sender, TappedEventArgs e)
     {
         try { HapticFeedback.Default.Perform(HapticFeedbackType.Click); }
-        catch (Exception ex)
-        {
-            System.Diagnostics.Debug.WriteLine($"[HAPTIC] {ex.Message}");
-        }
+        catch (Exception ex) { System.Diagnostics.Debug.WriteLine($"[HAPTIC] {ex.Message}"); }
 
         await Task.WhenAll(
             BtnLimpar.RotateToAsync(360, 320, Easing.CubicOut),
@@ -365,11 +364,10 @@ public partial class PlsPage : ContentPage
             PainelResultados.TranslationY = 40;
         }
 
-        // Limpa o ViewModel (zera todos os campos incluindo os de carne)
         if (BindingContext is PlsViewModel vm && vm.LimparCommand.CanExecute(null))
             vm.LimparCommand.Execute(null);
 
-        // Limpa os Entries de venda manualmente (evita reentrância da máscara)
+        // Limpa campos de vendas
         _atualizandoEstimada = true;
         _atualizandoReal = true;
         EntryEstimada.Text = "";
@@ -377,21 +375,26 @@ public partial class PlsPage : ContentPage
         _atualizandoEstimada = false;
         _atualizandoReal = false;
 
-        // Limpa os Entries de carne (binding bidirecional já cuida,
-        // mas limpamos o Text para garantir que o teclado não mantenha cache)
-        EntryHbRecipientes.Text = "";
+        // Limpa campos de carnes
         EntryHbUnidades.Text = "";
-        EntryWhopperRecipientes.Text = "";
+        EntryHbRecipientes.Text = "";
         EntryWhopperUnidades.Text = "";
-        EntryRebelRecipientes.Text = "";
+        EntryWhopperRecipientes.Text = "";
         EntryRebelUnidades.Text = "";
+        EntryRebelRecipientes.Text = "";
+
+        // Limpa campos de especiais
+        EntryBkChickenUnidades.Text = "";
+        EntryBkChickenRecipientes.Text = "";
+        EntryChickenJrUnidades.Text = "";
+        EntryChickenJrRecipientes.Text = "";
 
         await MainScroll.ScrollToAsync(0, 0, animated: true);
         EntryEstimada.Focus();
     }
 
     // ─────────────────────────────────────────────────────────────────────────
-    //  PAINEL EXPANSÍVEL DOS CARDS DE CARNE
+    //  PAINEL EXPANSÍVEL DOS CARDS DE CARNE / ESPECIAIS
     // ─────────────────────────────────────────────────────────────────────────
 
     private async void OnCardCarneTapped(object? sender, TappedEventArgs e)
@@ -403,7 +406,6 @@ public partial class PlsPage : ContentPage
 
         foreach (var filho in stackInterno.Children)
         {
-            // Localiza o chevron dentro do Grid de cabeçalho
             if (filho is Grid grid && chevron is null)
             {
                 foreach (var itemGrid in grid.Children)
@@ -416,7 +418,6 @@ public partial class PlsPage : ContentPage
                 }
             }
 
-            // Painel expansível: último VerticalStackLayout do stack
             if (filho is VerticalStackLayout vsl)
                 painelDetalhes = vsl;
         }
@@ -448,5 +449,66 @@ public partial class PlsPage : ContentPage
                 chevron.TextColor = Color.FromArgb("#CCCCDD");
             }
         }
+    }
+
+    // ─────────────────────────────────────────────────────────────────────────
+    //  CICLO DE VIDA — ANIMAÇÃO DO BOTÃO CALCULAR
+    // ─────────────────────────────────────────────────────────────────────────
+
+    protected override void OnAppearing()
+    {
+        base.OnAppearing();
+
+        if (BindingContext is PlsViewModel vm)
+            vm.PropertyChanged += OnViewModelPropertyChanged;
+    }
+
+    protected override void OnDisappearing()
+    {
+        base.OnDisappearing();
+
+        if (BindingContext is PlsViewModel vm)
+            vm.PropertyChanged -= OnViewModelPropertyChanged;
+    }
+
+    private void OnViewModelPropertyChanged(object? sender, PropertyChangedEventArgs e)
+    {
+        if (e.PropertyName == nameof(PlsViewModel.IsLoading))
+        {
+            if (BindingContext is PlsViewModel vm && vm.IsLoading)
+                AnimarProgressoAsync(); // fire-and-forget intencional
+        }
+    }
+
+    /// <summary>
+    /// Anima a BarraProgresso de 0 até a largura total do botão
+    /// enquanto IsLoading = true.
+    /// </summary>
+    private async void AnimarProgressoAsync()
+    {
+        BarraProgresso.WidthRequest = 0;
+
+        double larguraTotal = BtnCalcular.Width;
+        const uint duracao = 1000;
+        const uint passos = 60;
+        const uint intervalo = duracao / passos;
+
+        for (int i = 1; i <= passos; i++)
+        {
+            if (BindingContext is PlsViewModel vm && !vm.IsLoading) break;
+
+            double progresso = (double)i / passos;
+            double easedProgresso = progresso < 0.5
+                ? 2 * progresso * progresso
+                : 1 - Math.Pow(-2 * progresso + 2, 2) / 2;
+
+            BarraProgresso.WidthRequest = larguraTotal * easedProgresso;
+            await Task.Delay((int)intervalo);
+        }
+
+        // Garante que a barra complete antes de sumir
+        BarraProgresso.WidthRequest = larguraTotal;
+        await Task.Delay(150);
+        BarraProgresso.WidthRequest = 0;
     }
 }

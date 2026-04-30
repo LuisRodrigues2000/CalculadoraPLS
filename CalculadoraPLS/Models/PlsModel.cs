@@ -10,6 +10,8 @@
         public const int CapacidadeHB = 12;
         public const int CapacidadeWhopper = 9;
         public const int CapacidadeRebel = 8;
+        public const int CapacidadeBkChicken = 24;
+        public const int CapacidadeChickenJr = 8;
 
         /// <summary>
         /// Calcula a diferença percentual entre venda real e estimada.

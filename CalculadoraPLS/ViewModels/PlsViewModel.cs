@@ -23,15 +23,18 @@ namespace CalculadoraPLS.ViewModels
         private string _vendaRealFormatada = string.Empty;
 
         // ─── Campos privados — Inputs por carne ─────────────────────────────
-        // HB
         private string _hbRecipientes = string.Empty;
         private string _hbUnidades = string.Empty;
-        // Whopper
         private string _whopperRecipientes = string.Empty;
         private string _whopperUnidades = string.Empty;
-        // Rebel
         private string _rebelRecipientes = string.Empty;
         private string _rebelUnidades = string.Empty;
+
+        // ─── Campos privados — Inputs Especiais ─────────────────────────────
+        private string _bkChickenUnidades = string.Empty;
+        private string _bkChickenRecipientes = string.Empty;
+        private string _chickenJrUnidades = string.Empty;
+        private string _chickenJrRecipientes = string.Empty;
 
         // ─── Campos privados — Resultado ────────────────────────────────────
         private double _diferencaReal;
@@ -40,6 +43,9 @@ namespace CalculadoraPLS.ViewModels
         private string _corDiferencaFundo = "#F5F5FA";
         private string _labelTendencia = "● IGUAL";
         private string _diferencaFormatada = "0,00%";
+
+        // ─── Campo privado — Loading ─────────────────────────────────────────
+        private bool _isLoading;
 
         // ════════════════════════════════════════════════════════════════════
         //  PROPRIEDADES — VENDAS
@@ -70,17 +76,15 @@ namespace CalculadoraPLS.ViewModels
         }
 
         // ════════════════════════════════════════════════════════════════════
-        //  PROPRIEDADES — INPUTS POR CARNE
+        //  PROPRIEDADES — INPUTS CARNES
         // ════════════════════════════════════════════════════════════════════
 
-        /// <summary>Recipientes HB informados pelo usuário (texto do Entry)</summary>
         public string HbRecipientes
         {
             get => _hbRecipientes;
             set { _hbRecipientes = value; OnPropertyChanged(); AtualizarPodeCalcular(); }
         }
 
-        /// <summary>Unidades avulsas HB informadas pelo usuário (texto do Entry)</summary>
         public string HbUnidades
         {
             get => _hbUnidades;
@@ -109,6 +113,34 @@ namespace CalculadoraPLS.ViewModels
         {
             get => _rebelUnidades;
             set { _rebelUnidades = value; OnPropertyChanged(); AtualizarPodeCalcular(); }
+        }
+
+        // ════════════════════════════════════════════════════════════════════
+        //  PROPRIEDADES — INPUTS ESPECIAIS
+        // ════════════════════════════════════════════════════════════════════
+
+        public string BkChickenUnidades
+        {
+            get => _bkChickenUnidades;
+            set { _bkChickenUnidades = value; OnPropertyChanged(); AtualizarPodeCalcular(); }
+        }
+
+        public string BkChickenRecipientes
+        {
+            get => _bkChickenRecipientes;
+            set { _bkChickenRecipientes = value; OnPropertyChanged(); AtualizarPodeCalcular(); }
+        }
+
+        public string ChickenJrUnidades
+        {
+            get => _chickenJrUnidades;
+            set { _chickenJrUnidades = value; OnPropertyChanged(); AtualizarPodeCalcular(); }
+        }
+
+        public string ChickenJrRecipientes
+        {
+            get => _chickenJrRecipientes;
+            set { _chickenJrRecipientes = value; OnPropertyChanged(); AtualizarPodeCalcular(); }
         }
 
         // ════════════════════════════════════════════════════════════════════
@@ -151,8 +183,18 @@ namespace CalculadoraPLS.ViewModels
             set { _resultadoVisivel = value; OnPropertyChanged(); }
         }
 
-        /// <summary>Lista de resultados por tipo de carne (alimenta o BindableLayout)</summary>
+        /// <summary>Controla a visibilidade do indicador de carregamento no botão.</summary>
+        public bool IsLoading
+        {
+            get => _isLoading;
+            private set { _isLoading = value; OnPropertyChanged(); }
+        }
+
+        /// <summary>Resultados das carnes (HB, Whopper, Rebel)</summary>
         public ObservableCollection<ResultadoCarne> Resultados { get; } = new();
+
+        /// <summary>Resultados dos especiais (BK Chicken, Chicken Jr.)</summary>
+        public ObservableCollection<ResultadoCarne> ResultadosEspeciais { get; } = new();
 
         // ════════════════════════════════════════════════════════════════════
         //  COMANDOS
@@ -167,7 +209,8 @@ namespace CalculadoraPLS.ViewModels
 
         public PlsViewModel()
         {
-            CalcularCommand = new Command(Calcular, PodeCalcular);
+            // ✅ Wrapper assíncrono — permite usar async/await no Command
+            CalcularCommand = new Command(async () => await CalcularAsync(), PodeCalcular);
             LimparCommand = new Command(Limpar);
         }
 
@@ -179,19 +222,23 @@ namespace CalculadoraPLS.ViewModels
         /// Habilita o botão Calcular somente se:
         /// - Venda Estimada > 0
         /// - Venda Real preenchida
-        /// - Pelo menos uma carne com recipientes ou unidades > 0
+        /// - Pelo menos uma carne OU especial com recipientes ou unidades > 0
         /// </summary>
         private bool PodeCalcular()
         {
+            // Bloqueia o botão também enquanto o loading estiver ativo
+            if (_isLoading) return false;
+
             bool vendasOk = TryParseValor(VendaEstimada, out double est) &&
                             TryParseValor(VendaReal, out _) &&
                             est > 0;
 
-            // Verifica se pelo menos uma carne foi preenchida
             bool algumaCarne =
                 ParseIntSafe(HbRecipientes) > 0 || ParseIntSafe(HbUnidades) > 0 ||
                 ParseIntSafe(WhopperRecipientes) > 0 || ParseIntSafe(WhopperUnidades) > 0 ||
-                ParseIntSafe(RebelRecipientes) > 0 || ParseIntSafe(RebelUnidades) > 0;
+                ParseIntSafe(RebelRecipientes) > 0 || ParseIntSafe(RebelUnidades) > 0 ||
+                ParseIntSafe(BkChickenUnidades) > 0 || ParseIntSafe(BkChickenRecipientes) > 0 ||
+                ParseIntSafe(ChickenJrUnidades) > 0 || ParseIntSafe(ChickenJrRecipientes) > 0;
 
             return vendasOk && algumaCarne;
         }
@@ -200,41 +247,87 @@ namespace CalculadoraPLS.ViewModels
         private void AtualizarPodeCalcular()
             => ((Command)CalcularCommand).ChangeCanExecute();
 
-        /// <summary>Executa o cálculo principal do PLS.</summary>
-        private void Calcular()
+        /// <summary>
+        /// Substitui o Calcular() síncrono.
+        /// Roda o processamento em background para não travar a UI,
+        /// enquanto exibe o indicador de loading no botão.
+        /// </summary>
+        private async Task CalcularAsync()
         {
             if (!TryParseValor(VendaEstimada, out double estimada) ||
                 !TryParseValor(VendaReal, out double real))
                 return;
 
-            // Diferença percentual
-            DiferencaReal = PlsModel.CalcularDiferencaPercentual(estimada, real);
+            // ── Ativa o loading e desabilita o botão ────────────────────────
+            IsLoading = true;
+            AtualizarPodeCalcular();
 
-            // Lê os inputs de cada carne (0 se vazio)
-            int hbRec = ParseIntSafe(HbRecipientes);
-            int hbUn = ParseIntSafe(HbUnidades);
-            int wpRec = ParseIntSafe(WhopperRecipientes);
-            int wpUn = ParseIntSafe(WhopperUnidades);
-            int rebelRec = ParseIntSafe(RebelRecipientes);
-            int rebelUn = ParseIntSafe(RebelUnidades);
+            // ── Variáveis que receberão os resultados do background ──────────
+            double diferenca = 0;
+            ResultadoCarne? hbResult = null;
+            ResultadoCarne? wpResult = null;
+            ResultadoCarne? rebelResult = null;
+            ResultadoCarne? bkResult = null;
+            ResultadoCarne? cjResult = null;
 
-            // Reconstrói os cards de resultado
+            // ── Cálculo em background (não trava a UI thread) ────────────────
+            await Task.Run(() =>
+            {
+                diferenca = PlsModel.CalcularDiferencaPercentual(estimada, real);
+
+                // Lê inputs — Carnes
+                int hbRec = ParseIntSafe(HbRecipientes);
+                int hbUn = ParseIntSafe(HbUnidades);
+                int wpRec = ParseIntSafe(WhopperRecipientes);
+                int wpUn = ParseIntSafe(WhopperUnidades);
+                int rebelRec = ParseIntSafe(RebelRecipientes);
+                int rebelUn = ParseIntSafe(RebelUnidades);
+
+                // Lê inputs — Especiais
+                int bkRec = ParseIntSafe(BkChickenRecipientes);
+                int bkUn = ParseIntSafe(BkChickenUnidades);
+                int cjRec = ParseIntSafe(ChickenJrRecipientes);
+                int cjUn = ParseIntSafe(ChickenJrUnidades);
+
+                // Calcula — Carnes
+                hbResult = PlsModel.CalcularCarne("HB", PlsModel.CapacidadeHB, hbRec, hbUn, diferenca);
+                wpResult = PlsModel.CalcularCarne("Whopper", PlsModel.CapacidadeWhopper, wpRec, wpUn, diferenca);
+                rebelResult = PlsModel.CalcularCarne("Rebel", PlsModel.CapacidadeRebel, rebelRec, rebelUn, diferenca);
+
+                // Calcula — Especiais
+                bkResult = PlsModel.CalcularCarne("BK Chicken", PlsModel.CapacidadeBkChicken, bkRec, bkUn, diferenca);
+                cjResult = PlsModel.CalcularCarne("Chicken Jr.", PlsModel.CapacidadeChickenJr, cjRec, cjUn, diferenca);
+            });
+
+            // ── Atualiza a UI de volta na main thread ────────────────────────
+            DiferencaReal = diferenca;
+
             Resultados.Clear();
-            Resultados.Add(PlsModel.CalcularCarne("HB", PlsModel.CapacidadeHB, hbRec, hbUn, DiferencaReal));
-            Resultados.Add(PlsModel.CalcularCarne("Whopper", PlsModel.CapacidadeWhopper, wpRec, wpUn, DiferencaReal));
-            Resultados.Add(PlsModel.CalcularCarne("Rebel", PlsModel.CapacidadeRebel, rebelRec, rebelUn, DiferencaReal));
+            Resultados.Add(hbResult!);
+            Resultados.Add(wpResult!);
+            Resultados.Add(rebelResult!);
+
+            ResultadosEspeciais.Clear();
+            ResultadosEspeciais.Add(bkResult!);
+            ResultadosEspeciais.Add(cjResult!);
 
             ResultadoVisivel = true;
+
+            // ── Desativa o loading e reabilita o botão ───────────────────────
+            IsLoading = false;
+            AtualizarPodeCalcular();
         }
 
         /// <summary>Reseta todos os campos para o estado inicial.</summary>
         private void Limpar()
         {
+            // Vendas
             VendaEstimada = string.Empty;
             VendaReal = string.Empty;
             VendaEstimadaFormatada = string.Empty;
             VendaRealFormatada = string.Empty;
 
+            // Carnes
             HbRecipientes = string.Empty;
             HbUnidades = string.Empty;
             WhopperRecipientes = string.Empty;
@@ -242,9 +335,21 @@ namespace CalculadoraPLS.ViewModels
             RebelRecipientes = string.Empty;
             RebelUnidades = string.Empty;
 
+            // Especiais
+            BkChickenUnidades = string.Empty;
+            BkChickenRecipientes = string.Empty;
+            ChickenJrUnidades = string.Empty;
+            ChickenJrRecipientes = string.Empty;
+
+            // Resultado
             DiferencaReal = 0;
             ResultadoVisivel = false;
             Resultados.Clear();
+            ResultadosEspeciais.Clear();
+
+            // ✅ Garante reset do loading caso tenha ficado preso
+            IsLoading = false;
+            AtualizarPodeCalcular();
         }
 
         /// <summary>
@@ -252,7 +357,6 @@ namespace CalculadoraPLS.ViewModels
         /// </summary>
         private void AtualizarCorELabel()
         {
-            // ✅ Exibe o percentual arredondado para inteiro (regra da apostila)
             double valorExibir = Math.Round(_diferencaReal, MidpointRounding.AwayFromZero);
             var sinal = valorExibir >= 0 ? "+" : "";
             DiferencaFormatada = $"{sinal}{valorExibir:F0}%";
@@ -296,9 +400,7 @@ namespace CalculadoraPLS.ViewModels
             return false;
         }
 
-        /// <summary>
-        /// Parse seguro de inteiro. Retorna 0 se vazio ou inválido.
-        /// </summary>
+        /// <summary>Parse seguro de inteiro. Retorna 0 se vazio ou inválido.</summary>
         private static int ParseIntSafe(string texto)
             => int.TryParse(texto?.Trim(), out int v) ? Math.Max(0, v) : 0;
 
