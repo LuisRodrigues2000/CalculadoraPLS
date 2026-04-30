@@ -102,7 +102,7 @@ public partial class PlsPage : ContentPage
         => EntryHbUnidades.Focus();
 
     // ─────────────────────────────────────────────────────────────────────────
-    //  NAVEGAÇÃO — CARNES (Unidades → Recipientes por carne)
+    //  NAVEGAÇÃO — CARNES
     // ─────────────────────────────────────────────────────────────────────────
 
     private void OnEntryHbUnidadesCompleted(object? sender, EventArgs e)
@@ -124,7 +124,7 @@ public partial class PlsPage : ContentPage
         => EntryBkChickenUnidades.Focus();
 
     // ─────────────────────────────────────────────────────────────────────────
-    //  NAVEGAÇÃO — ESPECIAIS (Unidades → Recipientes por carne)
+    //  NAVEGAÇÃO — ESPECIAIS
     // ─────────────────────────────────────────────────────────────────────────
 
     private void OnEntryBkChickenUnidadesCompleted(object? sender, EventArgs e)
@@ -136,16 +136,12 @@ public partial class PlsPage : ContentPage
     private void OnEntryChickenJrUnidadesCompleted(object? sender, EventArgs e)
         => EntryChickenJrRecipientes.Focus();
 
-    /// <summary>
-    /// Último campo do formulário — fecha teclado e dispara o cálculo.
-    /// </summary>
     private async void OnEntryChickenJrRecipientesCompleted(object? sender, EventArgs e)
     {
         EntryChickenJrRecipientes.Unfocus();
 
         if (BindingContext is PlsViewModel vm && vm.CalcularCommand.CanExecute(null))
         {
-            // ✅ Aguarda o comando assíncrono terminar ANTES de animar
             vm.CalcularCommand.Execute(null);
             await EsperarCalculoTerminarAsync(vm);
             await AnimarResultadosAsync();
@@ -154,6 +150,7 @@ public partial class PlsPage : ContentPage
 
     // ─────────────────────────────────────────────────────────────────────────
     //  BOTÃO CALCULAR
+    //  ✅ É o único responsável por executar o cálculo — sem Command no XAML
     // ─────────────────────────────────────────────────────────────────────────
 
     private async void OnCalcularTapped(object? sender, TappedEventArgs e)
@@ -169,25 +166,18 @@ public partial class PlsPage : ContentPage
         await BtnCalcular.ScaleToAsync(0.95, 70, Easing.CubicOut);
         await BtnCalcular.ScaleToAsync(1.00, 70, Easing.CubicIn);
 
-        // ✅ Executa o comando (que internamente é async)
+        // Executa o cálculo via ViewModel
         vm.CalcularCommand.Execute(null);
 
-        // ✅ Aguarda o IsLoading voltar a false — só então anima os resultados
+        // Aguarda o cálculo assíncrono terminar
         await EsperarCalculoTerminarAsync(vm);
 
-        // ✅ Verifica novamente se o resultado está disponível
         if (vm.ResultadoVisivel)
             await AnimarResultadosAsync();
     }
 
-    /// <summary>
-    /// Aguarda o ViewModel terminar o cálculo assíncrono,
-    /// monitorando IsLoading com polling leve.
-    /// Tem timeout de segurança de 5 segundos.
-    /// </summary>
     private static async Task EsperarCalculoTerminarAsync(PlsViewModel vm)
     {
-        // Dá um tick para o IsLoading = true ser propagado
         await Task.Delay(50);
 
         const int timeoutMs = 5000;
@@ -210,21 +200,46 @@ public partial class PlsPage : ContentPage
         if (BindingContext is not PlsViewModel vm) return;
         if (!vm.ResultadoVisivel) return;
 
+        // 1. Esconde tudo imediatamente
+        PainelResultados.IsVisible = false;
         PainelResultados.Opacity = 0;
         PainelResultados.TranslationY = 40;
-        PainelResultados.IsVisible = true;
-
         CardDiferenca.Opacity = 0;
         CardDiferenca.TranslationY = 30;
 
+        // 2. Torna o painel visível para o BindableLayout renderizar os filhos
+        PainelResultados.IsVisible = true;
+
+        // 3. Aguarda o BindableLayout terminar de criar os cards (polling por contagem)
+        await AguardarCardsAsync(ListaCarnes, vm.Resultados.Count);
+        await AguardarCardsAsync(ListaEspeciais, vm.ResultadosEspeciais.Count);
+
+        // 4. Agora os cards existem — reseta opacidade e posição para animação
+        foreach (var card in ListaCarnes.Children.OfType<VisualElement>())
+        {
+            card.Opacity = 0;
+            card.TranslationY = 30;
+        }
+        foreach (var card in ListaEspeciais.Children.OfType<VisualElement>())
+        {
+            card.Opacity = 0;
+            card.TranslationY = 30;
+        }
+
+        // 5. Um frame extra para o reset ser aplicado antes de animar
+        await Task.Delay(32);
+
+        // 6. Anima o painel principal
         await PainelResultados.FadeToAsync(1, 300, Easing.CubicOut);
         PainelResultados.TranslationY = 0;
 
+        // 7. Anima o card de diferença
         await Task.WhenAll(
             CardDiferenca.FadeToAsync(1, 350, Easing.CubicOut),
             CardDiferenca.TranslateToAsync(0, 0, 350, Easing.CubicOut)
         );
 
+        // 8. Anima contador e cards em paralelo
         await Task.WhenAll(
             AnimarContadorAsync(vm.DiferencaReal),
             AnimarCardsCarneAsync(),
@@ -235,6 +250,25 @@ public partial class PlsPage : ContentPage
         await MainScroll.ScrollToAsync(ScrollAnchor, ScrollToPosition.Start, animated: true);
 
         await AnimarFabEntradaAsync();
+    }
+
+    /// <summary>
+    /// Polling que aguarda o BindableLayout criar a quantidade esperada de cards.
+    /// Timeout de segurança de 1 segundo.
+    /// </summary>
+    private static async Task AguardarCardsAsync(Layout lista, int quantidadeEsperada)
+    {
+        if (quantidadeEsperada == 0) return;
+
+        const int timeoutMs = 1000;
+        const int intervaloMs = 16; // ~1 frame a 60fps
+        int aguardado = 0;
+
+        while (lista.Children.Count < quantidadeEsperada && aguardado < timeoutMs)
+        {
+            await Task.Delay(intervaloMs);
+            aguardado += intervaloMs;
+        }
     }
 
     private async Task AnimarFabEntradaAsync()
@@ -288,19 +322,9 @@ public partial class PlsPage : ContentPage
 
     private async Task AnimarCardsCarneAsync()
     {
-        await Task.Delay(50);
-
-        var cards = ListaCarnes.Children
-            .OfType<VisualElement>()
-            .ToList();
-
+        // ✅ Sem reset aqui — já garantido em AnimarResultadosAsync após AguardarCardsAsync
+        var cards = ListaCarnes.Children.OfType<VisualElement>().ToList();
         if (cards.Count == 0) return;
-
-        foreach (var card in cards)
-        {
-            card.Opacity = 0;
-            card.TranslationY = 30;
-        }
 
         foreach (var card in cards)
         {
@@ -318,17 +342,9 @@ public partial class PlsPage : ContentPage
     {
         await Task.Delay(200);
 
-        var cards = ListaEspeciais.Children
-            .OfType<VisualElement>()
-            .ToList();
-
+        // ✅ Sem reset aqui — já garantido em AnimarResultadosAsync após AguardarCardsAsync
+        var cards = ListaEspeciais.Children.OfType<VisualElement>().ToList();
         if (cards.Count == 0) return;
-
-        foreach (var card in cards)
-        {
-            card.Opacity = 0;
-            card.TranslationY = 30;
-        }
 
         foreach (var card in cards)
         {
@@ -367,7 +383,6 @@ public partial class PlsPage : ContentPage
         if (BindingContext is PlsViewModel vm && vm.LimparCommand.CanExecute(null))
             vm.LimparCommand.Execute(null);
 
-        // Limpa campos de vendas
         _atualizandoEstimada = true;
         _atualizandoReal = true;
         EntryEstimada.Text = "";
@@ -375,7 +390,6 @@ public partial class PlsPage : ContentPage
         _atualizandoEstimada = false;
         _atualizandoReal = false;
 
-        // Limpa campos de carnes
         EntryHbUnidades.Text = "";
         EntryHbRecipientes.Text = "";
         EntryWhopperUnidades.Text = "";
@@ -383,7 +397,6 @@ public partial class PlsPage : ContentPage
         EntryRebelUnidades.Text = "";
         EntryRebelRecipientes.Text = "";
 
-        // Limpa campos de especiais
         EntryBkChickenUnidades.Text = "";
         EntryBkChickenRecipientes.Text = "";
         EntryChickenJrUnidades.Text = "";
@@ -452,7 +465,7 @@ public partial class PlsPage : ContentPage
     }
 
     // ─────────────────────────────────────────────────────────────────────────
-    //  CICLO DE VIDA — ANIMAÇÃO DO BOTÃO CALCULAR
+    //  CICLO DE VIDA
     // ─────────────────────────────────────────────────────────────────────────
 
     protected override void OnAppearing()
@@ -476,14 +489,10 @@ public partial class PlsPage : ContentPage
         if (e.PropertyName == nameof(PlsViewModel.IsLoading))
         {
             if (BindingContext is PlsViewModel vm && vm.IsLoading)
-                AnimarProgressoAsync(); // fire-and-forget intencional
+                AnimarProgressoAsync();
         }
     }
 
-    /// <summary>
-    /// Anima a BarraProgresso de 0 até a largura total do botão
-    /// enquanto IsLoading = true.
-    /// </summary>
     private async void AnimarProgressoAsync()
     {
         BarraProgresso.WidthRequest = 0;
@@ -506,7 +515,6 @@ public partial class PlsPage : ContentPage
             await Task.Delay((int)intervalo);
         }
 
-        // Garante que a barra complete antes de sumir
         BarraProgresso.WidthRequest = larguraTotal;
         await Task.Delay(150);
         BarraProgresso.WidthRequest = 0;
