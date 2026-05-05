@@ -35,6 +35,8 @@ namespace CalculadoraPLS.ViewModels
         private string _bkChickenRecipientes = string.Empty;
         private string _chickenJrUnidades = string.Empty;
         private string _chickenJrRecipientes = string.Empty;
+        private string _tenderCrispUnidades = string.Empty;
+        private string _tenderCrispRecipientes = string.Empty;
 
         // ─── Campos privados — Resultado ────────────────────────────────────
         private double _diferencaReal;
@@ -143,6 +145,18 @@ namespace CalculadoraPLS.ViewModels
             set { _chickenJrRecipientes = value; OnPropertyChanged(); AtualizarPodeCalcular(); }
         }
 
+        public string TenderCrispUnidades
+        {
+            get => _tenderCrispUnidades;
+            set { _tenderCrispUnidades = value; OnPropertyChanged(); AtualizarPodeCalcular(); }
+        }
+
+        public string TenderCrispRecipientes
+        {
+            get => _tenderCrispRecipientes;
+            set { _tenderCrispRecipientes = value; OnPropertyChanged(); AtualizarPodeCalcular(); }
+        }
+
         // ════════════════════════════════════════════════════════════════════
         //  PROPRIEDADES — RESULTADO
         // ════════════════════════════════════════════════════════════════════
@@ -238,7 +252,8 @@ namespace CalculadoraPLS.ViewModels
                 ParseIntSafe(WhopperRecipientes) > 0 || ParseIntSafe(WhopperUnidades) > 0 ||
                 ParseIntSafe(RebelRecipientes) > 0 || ParseIntSafe(RebelUnidades) > 0 ||
                 ParseIntSafe(BkChickenUnidades) > 0 || ParseIntSafe(BkChickenRecipientes) > 0 ||
-                ParseIntSafe(ChickenJrUnidades) > 0 || ParseIntSafe(ChickenJrRecipientes) > 0;
+                ParseIntSafe(ChickenJrUnidades) > 0 || ParseIntSafe(ChickenJrRecipientes) > 0 ||
+                ParseIntSafe(TenderCrispUnidades) > 0 || ParseIntSafe(TenderCrispRecipientes) > 0;
 
             return vendasOk && algumaCarne;
         }
@@ -269,6 +284,7 @@ namespace CalculadoraPLS.ViewModels
             ResultadoCarne? rebelResult = null;
             ResultadoCarne? bkResult = null;
             ResultadoCarne? cjResult = null;
+            ResultadoCarne? tcResult = null;
 
             // ── Cálculo em background (não trava a UI thread) ────────────────
             await Task.Run(() =>
@@ -288,6 +304,8 @@ namespace CalculadoraPLS.ViewModels
                 int bkUn = ParseIntSafe(BkChickenUnidades);
                 int cjRec = ParseIntSafe(ChickenJrRecipientes);
                 int cjUn = ParseIntSafe(ChickenJrUnidades);
+                int tcRec = ParseIntSafe(TenderCrispRecipientes);
+                int tcUn = ParseIntSafe(TenderCrispUnidades);
 
                 // Calcula — Carnes
                 hbResult = PlsModel.CalcularCarne("HB", PlsModel.CapacidadeHB, hbRec, hbUn, diferenca);
@@ -297,6 +315,7 @@ namespace CalculadoraPLS.ViewModels
                 // Calcula — Especiais
                 bkResult = PlsModel.CalcularCarne("BK Chicken", PlsModel.CapacidadeBkChicken, bkRec, bkUn, diferenca);
                 cjResult = PlsModel.CalcularCarne("Chicken Jr.", PlsModel.CapacidadeChickenJr, cjRec, cjUn, diferenca);
+                tcResult = PlsModel.CalcularCarne("Tender Crisp", PlsModel.CapacidadeTenderCrisp, tcRec, tcUn, diferenca);
             });
 
             // ── Atualiza a UI de volta na main thread ────────────────────────
@@ -310,6 +329,7 @@ namespace CalculadoraPLS.ViewModels
             ResultadosEspeciais.Clear();
             ResultadosEspeciais.Add(bkResult!);
             ResultadosEspeciais.Add(cjResult!);
+            ResultadosEspeciais.Add(tcResult!);
 
             ResultadoVisivel = true;
 
@@ -339,6 +359,8 @@ namespace CalculadoraPLS.ViewModels
             BkChickenUnidades = string.Empty;
             BkChickenRecipientes = string.Empty;
             ChickenJrUnidades = string.Empty;
+            TenderCrispUnidades = string.Empty;
+            TenderCrispRecipientes = string.Empty;
             ChickenJrRecipientes = string.Empty;
 
             // Resultado

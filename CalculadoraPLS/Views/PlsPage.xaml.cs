@@ -136,9 +136,15 @@ public partial class PlsPage : ContentPage
     private void OnEntryChickenJrUnidadesCompleted(object? sender, EventArgs e)
         => EntryChickenJrRecipientes.Focus();
 
-    private async void OnEntryChickenJrRecipientesCompleted(object? sender, EventArgs e)
+    private void OnEntryChickenJrRecipientesCompleted(object? sender, EventArgs e)
+        => EntryTenderCrispUnidades.Focus();
+
+    private void OnEntryTenderCrispUnidadesCompleted(object? sender, EventArgs e)
+        => EntryTenderCrispRecipientes.Focus();
+
+    private async void OnEntryTenderCrispRecipientesCompleted(object? sender, EventArgs e)
     {
-        EntryChickenJrRecipientes.Unfocus();
+        EntryTenderCrispRecipientes.Unfocus();
 
         if (BindingContext is PlsViewModel vm && vm.CalcularCommand.CanExecute(null))
         {
@@ -401,6 +407,8 @@ public partial class PlsPage : ContentPage
         EntryBkChickenRecipientes.Text = "";
         EntryChickenJrUnidades.Text = "";
         EntryChickenJrRecipientes.Text = "";
+        EntryTenderCrispUnidades.Text = "";
+        EntryTenderCrispRecipientes.Text = "";
 
         await MainScroll.ScrollToAsync(0, 0, animated: true);
         EntryEstimada.Focus();

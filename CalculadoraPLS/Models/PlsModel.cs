@@ -7,11 +7,24 @@
     public static class PlsModel
     {
         // ─── Capacidade fixa por recipiente ─────────────────────────────────
+        
+        /// <summary>Carne de HB: 12 unidades por recipiente.</summary>
         public const int CapacidadeHB = 12;
+        
+        /// <summary>Carne de Whopper: 9 unidades por recipiente.</summary>
         public const int CapacidadeWhopper = 9;
+        
+        /// <summary>Carne de Rebel: 8 unidades por recipiente.</summary>
         public const int CapacidadeRebel = 8;
+        
+        /// <summary>Bk Chicken: 24 unidades por recipiente.</summary>
         public const int CapacidadeBkChicken = 24;
+        
+        /// <summary>Chicken Jr: 8 unidades por recipiente.</summary>
         public const int CapacidadeChickenJr = 8;
+        
+        /// <summary>Tender Crisp: 4 unidades por recipiente.</summary>
+        public const int CapacidadeTenderCrisp = 4;
 
         /// <summary>
         /// Calcula a diferença percentual entre venda real e estimada.
