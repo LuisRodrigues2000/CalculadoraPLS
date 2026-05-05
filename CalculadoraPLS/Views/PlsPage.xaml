@@ -446,84 +446,84 @@
                 <VerticalStackLayout Spacing="12" Margin="0,0,0,28">
 
                     <Label
-        Text="ESPECIAIS"
-        FontSize="14"
-        FontAttributes="Bold"
-        TextColor="#0A0066"
-        CharacterSpacing="5"
-        Margin="2,0,0,4" />
+                        Text="ESPECIAIS"
+                        FontSize="14"
+                        FontAttributes="Bold"
+                        TextColor="#0A0066"
+                        CharacterSpacing="5"
+                        Margin="2,0,0,4" />
 
                     <!-- ─── Card BK Chicken ───────────────────────────── -->
                     <Border
-        BackgroundColor="#FFFFFF"
-        StrokeShape="RoundRectangle 16"
-        Stroke="#E8E8F0"
-        StrokeThickness="1.5"
-        Padding="20,18">
+                        BackgroundColor="#FFFFFF"
+                        StrokeShape="RoundRectangle 16"
+                        Stroke="#E8E8F0"
+                        StrokeThickness="1.5"
+                        Padding="20,18">
                         <Border.Shadow>
                             <Shadow Brush="#0008FF" Offset="0,2" Radius="12" Opacity="0.06" />
                         </Border.Shadow>
                         <VerticalStackLayout Spacing="14">
                             <Label
-                Text="BK Chicken"
-                FontSize="18"
-                FontAttributes="Bold"
-                TextColor="#0A0066"
-                CharacterSpacing="1" />
+                                Text="BK Chicken"
+                                FontSize="18"
+                                FontAttributes="Bold"
+                                TextColor="#0A0066"
+                                CharacterSpacing="1" />
                             <BoxView HeightRequest="1" BackgroundColor="#F0F0F8" />
                             <Grid ColumnDefinitions="*,24,*">
                                 <VerticalStackLayout Grid.Column="0" Spacing="6">
                                     <Label
-                        Text="UNIDADES"
-                        FontSize="10"
-                        FontAttributes="Bold"
-                        TextColor="#0A0066"
-                        CharacterSpacing="2" />
+                                        Text="UNIDADES"
+                                        FontSize="10"
+                                        FontAttributes="Bold"
+                                        TextColor="#0A0066"
+                                        CharacterSpacing="2" />
                                     <Grid RowDefinitions="*,2">
                                         <Entry
-                            x:Name="EntryBkChickenUnidades"
-                            Text="{Binding BkChickenUnidades}"
-                            Keyboard="Numeric"
-                            ReturnType="Next"
-                            FontSize="28"
-                            FontAttributes="Bold"
-                            TextColor="#0A0066"
-                            BackgroundColor="Transparent"
-                            Placeholder="0"
-                            PlaceholderColor="#CCCCDD"
-                            Focused="OnEntryInputFocused"
-                            Unfocused="OnEntryInputUnfocused"
-                            Completed="OnEntryBkChickenUnidadesCompleted" />
+                                            x:Name="EntryBkChickenUnidades"
+                                            Text="{Binding BkChickenUnidades}"
+                                            Keyboard="Numeric"
+                                            ReturnType="Next"
+                                            FontSize="28"
+                                            FontAttributes="Bold"
+                                            TextColor="#0A0066"
+                                            BackgroundColor="Transparent"
+                                            Placeholder="0"
+                                            PlaceholderColor="#CCCCDD"
+                                            Focused="OnEntryInputFocused"
+                                            Unfocused="OnEntryInputUnfocused"
+                                            Completed="OnEntryBkChickenUnidadesCompleted" />
                                         <BoxView Grid.Row="1" HeightRequest="2" BackgroundColor="#E8E8F0" />
                                     </Grid>
                                 </VerticalStackLayout>
                                 <BoxView
-                    Grid.Column="1"
-                    WidthRequest="1"
-                    BackgroundColor="#F0F0F8"
-                    VerticalOptions="Fill" />
+                                    Grid.Column="1"
+                                    WidthRequest="1"
+                                    BackgroundColor="#F0F0F8"
+                                    VerticalOptions="Fill" />
                                 <VerticalStackLayout Grid.Column="2" Spacing="6" Margin="8,0,0,0">
                                     <Label
-                        Text="RECIPIENTES"
-                        FontSize="10"
-                        FontAttributes="Bold"
-                        TextColor="#0A0066"
-                        CharacterSpacing="2" />
+                                        Text="RECIPIENTES"
+                                        FontSize="10"
+                                        FontAttributes="Bold"
+                                        TextColor="#0A0066"
+                                        CharacterSpacing="2" />
                                     <Grid RowDefinitions="*,2">
                                         <Entry
-                            x:Name="EntryBkChickenRecipientes"
-                            Text="{Binding BkChickenRecipientes}"
-                            Keyboard="Numeric"
-                            ReturnType="Next"
-                            FontSize="28"
-                            FontAttributes="Bold"
-                            TextColor="#0008FF"
-                            BackgroundColor="Transparent"
-                            Placeholder="0"
-                            PlaceholderColor="#CCCCDD"
-                            Focused="OnEntryInputFocused"
-                            Unfocused="OnEntryInputUnfocused"
-                            Completed="OnEntryBkChickenRecipientesCompleted" />
+                                            x:Name="EntryBkChickenRecipientes"
+                                            Text="{Binding BkChickenRecipientes}"
+                                            Keyboard="Numeric"
+                                            ReturnType="Next"
+                                            FontSize="28"
+                                            FontAttributes="Bold"
+                                            TextColor="#0008FF"
+                                            BackgroundColor="Transparent"
+                                            Placeholder="0"
+                                            PlaceholderColor="#CCCCDD"
+                                            Focused="OnEntryInputFocused"
+                                            Unfocused="OnEntryInputUnfocused"
+                                            Completed="OnEntryBkChickenRecipientesCompleted" />
                                         <BoxView Grid.Row="1" HeightRequest="2" BackgroundColor="#E8E8F0" />
                                     </Grid>
                                 </VerticalStackLayout>
@@ -533,75 +533,75 @@
 
                     <!-- ─── Card Chicken Jr. ──────────────────────────── -->
                     <Border
-        BackgroundColor="#FFFFFF"
-        StrokeShape="RoundRectangle 16"
-        Stroke="#E8E8F0"
-        StrokeThickness="1.5"
-        Padding="20,18">
+                        BackgroundColor="#FFFFFF"
+                        StrokeShape="RoundRectangle 16"
+                        Stroke="#E8E8F0"
+                        StrokeThickness="1.5"
+                        Padding="20,18">
                         <Border.Shadow>
                             <Shadow Brush="#0008FF" Offset="0,2" Radius="12" Opacity="0.06" />
                         </Border.Shadow>
                         <VerticalStackLayout Spacing="14">
                             <Label
-                Text="Chicken Jr."
-                FontSize="18"
-                FontAttributes="Bold"
-                TextColor="#0A0066"
-                CharacterSpacing="1" />
+                                Text="Chicken Jr."
+                                FontSize="18"
+                                FontAttributes="Bold"
+                                TextColor="#0A0066"
+                                CharacterSpacing="1" />
                             <BoxView HeightRequest="1" BackgroundColor="#F0F0F8" />
                             <Grid ColumnDefinitions="*,24,*">
                                 <VerticalStackLayout Grid.Column="0" Spacing="6">
                                     <Label
-                        Text="UNIDADES"
-                        FontSize="10"
-                        FontAttributes="Bold"
-                        TextColor="#0A0066"
-                        CharacterSpacing="2" />
+                                        Text="UNIDADES"
+                                        FontSize="10"
+                                        FontAttributes="Bold"
+                                        TextColor="#0A0066"
+                                        CharacterSpacing="2" />
                                     <Grid RowDefinitions="*,2">
                                         <Entry
-                            x:Name="EntryChickenJrUnidades"
-                            Text="{Binding ChickenJrUnidades}"
-                            Keyboard="Numeric"
-                            ReturnType="Next"
-                            FontSize="28"
-                            FontAttributes="Bold"
-                            TextColor="#0A0066"
-                            BackgroundColor="Transparent"
-                            Placeholder="0"
-                            PlaceholderColor="#CCCCDD"
-                            Focused="OnEntryInputFocused"
-                            Unfocused="OnEntryInputUnfocused"
-                            Completed="OnEntryChickenJrUnidadesCompleted" />
+                                            x:Name="EntryChickenJrUnidades"
+                                            Text="{Binding ChickenJrUnidades}"
+                                            Keyboard="Numeric"
+                                            ReturnType="Next"
+                                            FontSize="28"
+                                            FontAttributes="Bold"
+                                            TextColor="#0A0066"
+                                            BackgroundColor="Transparent"
+                                            Placeholder="0"
+                                            PlaceholderColor="#CCCCDD"
+                                            Focused="OnEntryInputFocused"
+                                            Unfocused="OnEntryInputUnfocused"
+                                            Completed="OnEntryChickenJrUnidadesCompleted" />
                                         <BoxView Grid.Row="1" HeightRequest="2" BackgroundColor="#E8E8F0" />
                                     </Grid>
                                 </VerticalStackLayout>
                                 <BoxView
-                    Grid.Column="1"
-                    WidthRequest="1"
-                    BackgroundColor="#F0F0F8"
-                    VerticalOptions="Fill" />
+                                    Grid.Column="1"
+                                    WidthRequest="1"
+                                    BackgroundColor="#F0F0F8"
+                                    VerticalOptions="Fill" />
                                 <VerticalStackLayout Grid.Column="2" Spacing="6" Margin="8,0,0,0">
                                     <Label
-                        Text="RECIPIENTES"
-                        FontSize="10"
-                        FontAttributes="Bold"
-                        TextColor="#0A0066"
-                        CharacterSpacing="2" />
+                                        Text="RECIPIENTES"
+                                        FontSize="10"
+                                        FontAttributes="Bold"
+                                        TextColor="#0A0066"
+                                        CharacterSpacing="2" />
                                     <Grid RowDefinitions="*,2">
                                         <Entry
-                            x:Name="EntryChickenJrRecipientes"
-                            Text="{Binding ChickenJrRecipientes}"
-                            Keyboard="Numeric"
-                            ReturnType="Next"
-                            FontSize="28"
-                            FontAttributes="Bold"
-                            TextColor="#0008FF"
-                            BackgroundColor="Transparent"
-                            Placeholder="0"
-                            PlaceholderColor="#CCCCDD"
-                            Focused="OnEntryInputFocused"
-                            Unfocused="OnEntryInputUnfocused"
-                            Completed="OnEntryChickenJrRecipientesCompleted" />
+                                            x:Name="EntryChickenJrRecipientes"
+                                            Text="{Binding ChickenJrRecipientes}"
+                                            Keyboard="Numeric"
+                                            ReturnType="Next"
+                                            FontSize="28"
+                                            FontAttributes="Bold"
+                                            TextColor="#0008FF"
+                                            BackgroundColor="Transparent"
+                                            Placeholder="0"
+                                            PlaceholderColor="#CCCCDD"
+                                            Focused="OnEntryInputFocused"
+                                            Unfocused="OnEntryInputUnfocused"
+                                            Completed="OnEntryChickenJrRecipientesCompleted" />
                                         <BoxView Grid.Row="1" HeightRequest="2" BackgroundColor="#E8E8F0" />
                                     </Grid>
                                 </VerticalStackLayout>
@@ -611,75 +611,75 @@
 
                     <!-- ─── Card Tender Crisp ─────────────────────────── -->
                     <Border
-        BackgroundColor="#FFFFFF"
-        StrokeShape="RoundRectangle 16"
-        Stroke="#E8E8F0"
-        StrokeThickness="1.5"
-        Padding="20,18">
+                        BackgroundColor="#FFFFFF"
+                        StrokeShape="RoundRectangle 16"
+                        Stroke="#E8E8F0"
+                        StrokeThickness="1.5"
+                        Padding="20,18">
                         <Border.Shadow>
                             <Shadow Brush="#0008FF" Offset="0,2" Radius="12" Opacity="0.06" />
                         </Border.Shadow>
                         <VerticalStackLayout Spacing="14">
                             <Label
-                Text="Tender Crisp"
-                FontSize="18"
-                FontAttributes="Bold"
-                TextColor="#0A0066"
-                CharacterSpacing="1" />
+                                Text="Tender Crisp"
+                                FontSize="18"
+                                FontAttributes="Bold"
+                                TextColor="#0A0066"
+                                CharacterSpacing="1" />
                             <BoxView HeightRequest="1" BackgroundColor="#F0F0F8" />
                             <Grid ColumnDefinitions="*,24,*">
                                 <VerticalStackLayout Grid.Column="0" Spacing="6">
                                     <Label
-                        Text="UNIDADES"
-                        FontSize="10"
-                        FontAttributes="Bold"
-                        TextColor="#0A0066"
-                        CharacterSpacing="2" />
+                                        Text="UNIDADES"
+                                        FontSize="10"
+                                        FontAttributes="Bold"
+                                        TextColor="#0A0066"
+                                        CharacterSpacing="2" />
                                     <Grid RowDefinitions="*,2">
                                         <Entry
-                            x:Name="EntryTenderCrispUnidades"
-                            Text="{Binding TenderCrispUnidades}"
-                            Keyboard="Numeric"
-                            ReturnType="Next"
-                            FontSize="28"
-                            FontAttributes="Bold"
-                            TextColor="#0A0066"
-                            BackgroundColor="Transparent"
-                            Placeholder="0"
-                            PlaceholderColor="#CCCCDD"
-                            Focused="OnEntryInputFocused"
-                            Unfocused="OnEntryInputUnfocused"
-                            Completed="OnEntryTenderCrispUnidadesCompleted" />
+                                            x:Name="EntryTenderCrispUnidades"
+                                            Text="{Binding TenderCrispUnidades}"
+                                            Keyboard="Numeric"
+                                            ReturnType="Next"
+                                            FontSize="28"
+                                            FontAttributes="Bold"
+                                            TextColor="#0A0066"
+                                            BackgroundColor="Transparent"
+                                            Placeholder="0"
+                                            PlaceholderColor="#CCCCDD"
+                                            Focused="OnEntryInputFocused"
+                                            Unfocused="OnEntryInputUnfocused"
+                                            Completed="OnEntryTenderCrispUnidadesCompleted" />
                                         <BoxView Grid.Row="1" HeightRequest="2" BackgroundColor="#E8E8F0" />
                                     </Grid>
                                 </VerticalStackLayout>
                                 <BoxView
-                    Grid.Column="1"
-                    WidthRequest="1"
-                    BackgroundColor="#F0F0F8"
-                    VerticalOptions="Fill" />
+                                    Grid.Column="1"
+                                    WidthRequest="1"
+                                    BackgroundColor="#F0F0F8"
+                                    VerticalOptions="Fill" />
                                 <VerticalStackLayout Grid.Column="2" Spacing="6" Margin="8,0,0,0">
                                     <Label
-                        Text="RECIPIENTES"
-                        FontSize="10"
-                        FontAttributes="Bold"
-                        TextColor="#0A0066"
-                        CharacterSpacing="2" />
+                                        Text="RECIPIENTES"
+                                        FontSize="10"
+                                        FontAttributes="Bold"
+                                        TextColor="#0A0066"
+                                        CharacterSpacing="2" />
                                     <Grid RowDefinitions="*,2">
                                         <Entry
-                            x:Name="EntryTenderCrispRecipientes"
-                            Text="{Binding TenderCrispRecipientes}"
-                            Keyboard="Numeric"
-                            ReturnType="Done"
-                            FontSize="28"
-                            FontAttributes="Bold"
-                            TextColor="#0008FF"
-                            BackgroundColor="Transparent"
-                            Placeholder="0"
-                            PlaceholderColor="#CCCCDD"
-                            Focused="OnEntryInputFocused"
-                            Unfocused="OnEntryInputUnfocused"
-                            Completed="OnEntryTenderCrispRecipientesCompleted" />
+                                            x:Name="EntryTenderCrispRecipientes"
+                                            Text="{Binding TenderCrispRecipientes}"
+                                            Keyboard="Numeric"
+                                            ReturnType="Done"
+                                            FontSize="28"
+                                            FontAttributes="Bold"
+                                            TextColor="#0008FF"
+                                            BackgroundColor="Transparent"
+                                            Placeholder="0"
+                                            PlaceholderColor="#CCCCDD"
+                                            Focused="OnEntryInputFocused"
+                                            Unfocused="OnEntryInputUnfocused"
+                                            Completed="OnEntryTenderCrispRecipientesCompleted" />
                                         <BoxView Grid.Row="1" HeightRequest="2" BackgroundColor="#E8E8F0" />
                                     </Grid>
                                 </VerticalStackLayout>
@@ -691,8 +691,6 @@
 
                 <!-- ══════════════════════════════════════════ -->
                 <!--  BOTÃO CALCULAR                            -->
-                <!--  ⚠️ Command REMOVIDO — controlado só       -->
-                <!--     pelo OnCalcularTapped no code-behind   -->
                 <!-- ══════════════════════════════════════════ -->
                 <Border x:Name="BtnCalcular"
                         Style="{StaticResource BotaoPrincipalStyle}"
@@ -701,17 +699,14 @@
                         <RoundRectangle CornerRadius="14" />
                     </Border.StrokeShape>
                     <Border.GestureRecognizers>
-                        <!--  ✅ Apenas o Tapped — sem Command para evitar duplo disparo -->
                         <TapGestureRecognizer Tapped="OnCalcularTapped" />
                     </Border.GestureRecognizers>
                     <Grid>
-                        <!-- ① Barra de progresso -->
                         <BoxView x:Name="BarraProgresso"
                                  Color="#5C85FF"
                                  HorizontalOptions="Start"
                                  VerticalOptions="Fill"
                                  WidthRequest="0" />
-                        <!-- ② Texto "CALCULAR" -->
                         <Label Text="CALCULAR"
                                FontSize="15"
                                FontAttributes="Bold"
@@ -727,7 +722,6 @@
                                 </DataTrigger>
                             </Label.Triggers>
                         </Label>
-                        <!-- ③ Texto "CALCULANDO..." -->
                         <Label Text="CALCULANDO..."
                                FontSize="13"
                                FontAttributes="Bold"
@@ -760,7 +754,7 @@
                     <BoxView x:Name="ScrollAnchor" HeightRequest="1" BackgroundColor="Transparent" />
                     <BoxView HeightRequest="1" BackgroundColor="#EEEEEE" Margin="0,0,0,4" />
 
-                    <!-- Card da diferença percentual -->
+                    <!-- ✅ ALTERADO: Card da diferença percentual — agora expansível -->
                     <Border
                         x:Name="CardDiferenca"
                         BackgroundColor="#FFFFFF"
@@ -774,36 +768,92 @@
                         <Border.Shadow>
                             <Shadow Brush="#0008FF" Offset="0,4" Radius="16" Opacity="0.08" />
                         </Border.Shadow>
-                        <Grid ColumnDefinitions="*,Auto">
-                            <VerticalStackLayout Grid.Column="0" Spacing="4">
+                        <!-- ✅ NOVO: Tap para expandir -->
+                        <Border.GestureRecognizers>
+                            <TapGestureRecognizer Tapped="OnCardDiferencaTapped" />
+                        </Border.GestureRecognizers>
+                        <VerticalStackLayout Spacing="0">
+                            <!-- Linha principal: valor + badge + chevron -->
+                            <Grid ColumnDefinitions="*,Auto,Auto">
+                                <VerticalStackLayout Grid.Column="0" Spacing="4">
+                                    <Label
+                                        Text="DIFERENÇA"
+                                        FontSize="14"
+                                        FontAttributes="Bold"
+                                        TextColor="#0A0066"
+                                        CharacterSpacing="5" />
+                                    <Label
+                                        x:Name="LblDiferenca"
+                                        Text="0,00%"
+                                        FontSize="45"
+                                        FontAttributes="Bold"
+                                        TextColor="{Binding CorDiferenca}"
+                                        LineBreakMode="NoWrap" />
+                                </VerticalStackLayout>
+                                <Border
+                                    Grid.Column="1"
+                                    BackgroundColor="{Binding CorDiferencaFundo}"
+                                    StrokeShape="RoundRectangle 10"
+                                    Stroke="Transparent"
+                                    Padding="14,8"
+                                    VerticalOptions="Center">
+                                    <Label
+                                        Text="{Binding LabelTendencia}"
+                                        FontSize="12"
+                                        FontAttributes="Bold"
+                                        TextColor="{Binding CorDiferenca}" />
+                                </Border>
+                                <!-- ✅ NOVO: Chevron animado -->
                                 <Label
-                                    Text="DIFERENÇA"
-                                    FontSize="14"
+                                    x:Name="ChevronDiferenca"
+                                    Grid.Column="2"
+                                    Text="▾"
+                                    FontSize="22"
                                     FontAttributes="Bold"
-                                    TextColor="#0A0066"
-                                    CharacterSpacing="5" />
-                                <Label
-                                    x:Name="LblDiferenca"
-                                    Text="0,00%"
-                                    FontSize="45"
-                                    FontAttributes="Bold"
-                                    TextColor="{Binding CorDiferenca}"
-                                    LineBreakMode="NoWrap" />
+                                    TextColor="#CCCCDD"
+                                    VerticalOptions="Center"
+                                    Margin="12,0,2,0" />
+                            </Grid>
+
+                            <!-- ✅ NOVO: Painel expansível com detalhe do arredondamento -->
+                            <VerticalStackLayout
+                                x:Name="PainelDetalheDiferenca"
+                                IsVisible="False"
+                                Opacity="0"
+                                TranslationY="-10"
+                                Spacing="12"
+                                Margin="0,16,0,0">
+                                <BoxView HeightRequest="1" BackgroundColor="#F0F0F8" />
+                                <Grid ColumnDefinitions="*,*">
+                                    <VerticalStackLayout Grid.Column="0" Spacing="4">
+                                        <Label
+                                            Text="CALCULADO"
+                                            FontSize="10"
+                                            FontAttributes="Bold"
+                                            TextColor="#AAAACC"
+                                            CharacterSpacing="2" />
+                                        <Label
+                                            x:Name="LblDiferencaCalculada"
+                                            FontSize="20"
+                                            FontAttributes="Bold"
+                                            TextColor="#0A0066" />
+                                    </VerticalStackLayout>
+                                    <VerticalStackLayout Grid.Column="1" Spacing="4">
+                                        <Label
+                                            Text="ARREDONDADO"
+                                            FontSize="10"
+                                            FontAttributes="Bold"
+                                            TextColor="#AAAACC"
+                                            CharacterSpacing="2" />
+                                        <Label
+                                            x:Name="LblDiferencaArredondada"
+                                            FontSize="20"
+                                            FontAttributes="Bold"
+                                            TextColor="#0A0066" />
+                                    </VerticalStackLayout>
+                                </Grid>
                             </VerticalStackLayout>
-                            <Border
-                                BackgroundColor="{Binding CorDiferencaFundo}"
-                                StrokeShape="RoundRectangle 10"
-                                Stroke="Transparent"
-                                Padding="14,8"
-                                VerticalOptions="Center"
-                                Grid.Column="1">
-                                <Label
-                                    Text="{Binding LabelTendencia}"
-                                    FontSize="12"
-                                    FontAttributes="Bold"
-                                    TextColor="{Binding CorDiferenca}" />
-                            </Border>
-                        </Grid>
+                        </VerticalStackLayout>
                     </Border>
 
                     <!-- Título resultados CARNES -->
@@ -816,7 +866,7 @@
                         Margin="2,50,0,10" />
 
                     <!-- Cards de resultado — Carnes -->
-                    <!--  ✅ Opacity e TranslationY REMOVIDOS do Border do DataTemplate -->
+                    <!-- ✅ ALTERADO: Chevron › trocado por ▾ -->
                     <VerticalStackLayout
                         x:Name="ListaCarnes"
                         BindableLayout.ItemsSource="{Binding Resultados}"
@@ -845,9 +895,10 @@
                                                 VerticalOptions="Center"
                                                 CharacterSpacing="1"
                                                 Grid.Column="0" />
+                                            <!-- ✅ ALTERADO: › → ▾, FontSize 32 → 22 -->
                                             <Label
-                                                Text="›"
-                                                FontSize="32"
+                                                Text="▾"
+                                                FontSize="22"
                                                 FontAttributes="Bold"
                                                 TextColor="#CCCCDD"
                                                 VerticalOptions="Center"
@@ -963,7 +1014,7 @@
                         Margin="2,32,0,10" />
 
                     <!-- Cards de resultado — Especiais -->
-                    <!--  ✅ Opacity e TranslationY REMOVIDOS do Border do DataTemplate -->
+                    <!-- ✅ ALTERADO: Chevron › trocado por ▾ -->
                     <VerticalStackLayout
                         x:Name="ListaEspeciais"
                         BindableLayout.ItemsSource="{Binding ResultadosEspeciais}"
@@ -992,9 +1043,10 @@
                                                 VerticalOptions="Center"
                                                 CharacterSpacing="1"
                                                 Grid.Column="0" />
+                                            <!-- ✅ ALTERADO: › → ▾, FontSize 32 → 22 -->
                                             <Label
-                                                Text="›"
-                                                FontSize="32"
+                                                Text="▾"
+                                                FontSize="22"
                                                 FontAttributes="Bold"
                                                 TextColor="#CCCCDD"
                                                 VerticalOptions="Center"
@@ -1144,11 +1196,14 @@
                 </Border.GestureRecognizers>
                 <Label
                     Text="↺"
-                    FontSize="28"
+                    FontSize="26"
                     TextColor="#FFFFFF"
                     HorizontalOptions="Center"
                     VerticalOptions="Center"
-                    Margin="0,0,0,2" />
+                    HorizontalTextAlignment="Center"
+                    VerticalTextAlignment="Center"
+                    Padding="0"
+                    Margin="0" />
             </Border>
         </Grid>
 

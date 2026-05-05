@@ -212,6 +212,11 @@ public partial class PlsPage : ContentPage
         PainelResultados.TranslationY = 40;
         CardDiferenca.Opacity = 0;
         CardDiferenca.TranslationY = 30;
+        PainelDetalheDiferenca.IsVisible = false;
+        PainelDetalheDiferenca.Opacity = 0;
+        PainelDetalheDiferenca.TranslationY = -10;
+        ChevronDiferenca.Text = "▾";
+        ChevronDiferenca.Rotation = 0;
 
         // 2. Torna o painel visível para o BindableLayout renderizar os filhos
         PainelResultados.IsVisible = true;
@@ -410,6 +415,12 @@ public partial class PlsPage : ContentPage
         EntryTenderCrispUnidades.Text = "";
         EntryTenderCrispRecipientes.Text = "";
 
+        PainelDetalheDiferenca.IsVisible = false;
+        PainelDetalheDiferenca.Opacity = 0;
+        PainelDetalheDiferenca.TranslationY = -10;
+        ChevronDiferenca.Text = "▾";
+        ChevronDiferenca.Rotation = 0;
+
         await MainScroll.ScrollToAsync(0, 0, animated: true);
         EntryEstimada.Focus();
     }
@@ -425,13 +436,15 @@ public partial class PlsPage : ContentPage
         VerticalStackLayout? painelDetalhes = null;
         Label? chevron = null;
 
+        // Localiza o chevron e o painel de detalhes
         foreach (var filho in stackInterno.Children)
         {
             if (filho is Grid grid && chevron is null)
             {
-                foreach (var itemGrid in grid.Children)
+                foreach (var item in grid.Children)
                 {
-                    if (itemGrid is Label lbl && lbl.FontSize == 32)
+                    if (item is Label lbl && lbl.FontSize == 22 &&
+                        (lbl.Text == "▾" || lbl.Text == "▴"))
                     {
                         chevron = lbl;
                         break;
@@ -446,31 +459,56 @@ public partial class PlsPage : ContentPage
         if (painelDetalhes is null) return;
 
         bool abrindo = !painelDetalhes.IsVisible;
+        await AnimarExpansaoAsync(painelDetalhes, chevron, abrindo);
+    }
 
+    private async void OnCardDiferencaTapped(object? sender, TappedEventArgs e)
+    {
+        if (BindingContext is not PlsViewModel vm) return;
+
+        // Preenche os valores detalhados antes de animar
+        var sinalCalc = vm.DiferencaReal >= 0 ? "+" : "";
+        LblDiferencaCalculada.Text = $"{sinalCalc}{vm.DiferencaReal:F2}%";
+
+        var valorArred = Math.Round(vm.DiferencaReal, MidpointRounding.AwayFromZero);
+        var sinalArred = valorArred >= 0 ? "+" : "";
+        LblDiferencaArredondada.Text = $"{sinalArred}{valorArred:F0}%";
+
+        bool abrindo = !PainelDetalheDiferenca.IsVisible;
+        await AnimarExpansaoAsync(PainelDetalheDiferenca, ChevronDiferenca, abrindo);
+    }
+
+    // Anima a expansão/colapso de um painel com fade + slide
+    private async Task AnimarExpansaoAsync(VerticalStackLayout painel, Label? chevron, bool abrindo)
+    {
         if (abrindo)
         {
-            painelDetalhes.Opacity = 0;
-            painelDetalhes.IsVisible = true;
-            await painelDetalhes.FadeToAsync(1, 220, Easing.CubicOut);
-
-            if (chevron is not null)
-            {
-                chevron.Text = "∨";
-                chevron.TextColor = Color.FromArgb("#0008FF");
-            }
+            painel.IsVisible = true;
+            await Task.WhenAll(
+                painel.FadeToAsync(1, 200),
+                painel.TranslateToAsync(0, 0, 200, Easing.CubicOut)
+            );
         }
         else
         {
-            await painelDetalhes.FadeToAsync(0, 160, Easing.CubicOut);
-            painelDetalhes.IsVisible = false;
-
-            if (chevron is not null)
-            {
-                chevron.Text = "›";
-                chevron.TextColor = Color.FromArgb("#CCCCDD");
-            }
+            await Task.WhenAll(
+                painel.FadeToAsync(0, 150),
+                painel.TranslateToAsync(0, -10, 150, Easing.CubicIn)
+            );
+            painel.IsVisible = false;
         }
+
+        if (chevron is not null)
+            await RotacionarChevronAsync(chevron, abrindo);
     }
+
+    // Rotaciona o símbolo de chevron ▾ ao abrir/fechar
+    private static async Task RotacionarChevronAsync(Label chevron, bool abrindo)
+    {
+        await chevron.RotateToAsync(abrindo ? 180 : 0, 200, Easing.CubicOut);
+    }
+
+
 
     // ─────────────────────────────────────────────────────────────────────────
     //  CICLO DE VIDA
